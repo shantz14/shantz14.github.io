@@ -1,0 +1,99 @@
+body {
+    background-color: rgb(26, 25, 25);
+    color: white;
+    font-family:Arial, Helvetica, sans-serif;
+    overflow: hidden;
+}
+  
+.container {
+    height: 100vh;
+    width: 100vw;
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    grid-template-areas:
+    "bio projectContainer"
+    ;
+}
+
+a {
+    color: white;
+    text-decoration: none;
+}
+
+a:hover, a:active, a:visited, a:link {
+    color: white;
+    text-decoration: none;
+}
+
+
+.line {
+    height: 0;
+    margin: 0 10px;
+    border-top: 1px solid white;
+    width: 10%;
+}
+
+.bio {
+    grid-area: bio;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.projectContainer {
+    grid-area: projectContainer;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-right: 50px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    overflow-y: scroll;
+
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.projectContainer::-webkit-scrollbar {
+    display: none;
+}
+
+.icons {
+    display: flex;
+    margin-left: 20px;
+}
+
+.icons a {
+    margin: 8px;
+}
+
+.project {
+    background-color: rgb(34, 33, 44);
+    margin: 8px;
+    margin-bottom: 0px;
+}
+
+.project h3 {
+    margin: 25px;
+    margin-bottom: -15px;
+}
+
+.project h5 {
+    margin: 25px;
+    margin-bottom: -15px;
+    text-decoration: solid;
+}
+
+.project p {
+    margin: 25px;
+}
+
+h1 {
+    color: darkcyan;
+    font-size: 45;
+}
+
+p {
+    color: gray;
+}
