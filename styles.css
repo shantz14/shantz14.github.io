@@ -71,7 +71,11 @@ a:hover, a:active, a:visited, a:link {
 .project {
     background-color: rgb(34, 33, 44);
     margin: 8px;
-    margin-bottom: 0px;
+}
+
+.github {
+    margin-bottom: 5px;
+    margin-left: 5px;
 }
 
 .project h3 {
@@ -87,6 +91,7 @@ a:hover, a:active, a:visited, a:link {
 
 .project p {
     margin: 25px;
+    margin-bottom: 5px;
 }
 
 h1 {
