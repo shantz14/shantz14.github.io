@@ -1,104 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg:          #0d0d14;
+  --bg-card:     #15141e;
+  --bg-card-h:   #1c1b2a;
+  --accent:      #22d3ee;
+  --name-color:  #7eadb8;
+  --accent-dim:  rgba(34, 211, 238, 0.12);
+  --accent-border: rgba(34, 211, 238, 0.25);
+  --text:        #e2e8f0;
+  --text-muted:  #64748b;
+  --border:      rgba(255, 255, 255, 0.06);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
-    background-color: rgb(26, 25, 25);
-    color: white;
-    font-family:Arial, Helvetica, sans-serif;
-    overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+  overflow: hidden;
+  height: 100vh;
 }
-  
+
+/* ── Layout ────────────────────────────────────────────── */
+
 .container {
-    height: 100vh;
-    width: 100vw;
-    display: grid;
-    grid-template-columns: 1fr 3fr;
-    grid-template-areas:
-    "bio projectContainer"
-    ;
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-template-areas: "bio projectContainer";
 }
 
-a {
-    color: white;
-    text-decoration: none;
-}
-
-a:hover, a:active, a:visited, a:link {
-    color: white;
-    text-decoration: none;
-}
-
-
-.line {
-    height: 0;
-    margin: 0 10px;
-    border-top: 1px solid white;
-    width: 10%;
-}
+/* ── Bio ────────────────────────────────────────────────── */
 
 .bio {
-    grid-area: bio;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  grid-area: bio;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 48px;
+  border-right: 1px solid var(--border);
 }
 
-.projectContainer {
-    grid-area: projectContainer;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding-right: 50px;
-    padding-top: 50px;
-    padding-bottom: 50px;
-    overflow-y: scroll;
-
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+.bio h1 {
+  color: var(--name-color);
+  font-size: 2.6rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  margin-bottom: 10px;
 }
 
-.projectContainer::-webkit-scrollbar {
-    display: none;
+.bio h3 {
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+}
+
+.bio p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.75;
+  margin-bottom: 6px;
 }
 
 .icons {
-    display: flex;
-    margin-left: 20px;
+  display: flex;
+  gap: 18px;
+  margin-top: 36px;
 }
 
 .icons a {
-    margin: 8px;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  transition: color 0.2s;
 }
+
+.icons a:hover { color: var(--accent); }
+
+/* ── Projects ───────────────────────────────────────────── */
+
+.projectContainer {
+  grid-area: projectContainer;
+  display: flex;
+  flex-direction: column;
+  padding: 60px 52px;
+  overflow-y: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.projectContainer::-webkit-scrollbar { display: none; }
+
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 3.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+/* ── Project card ───────────────────────────────────────── */
 
 .project {
-    background-color: rgb(34, 33, 44);
-    margin: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--accent);
+  border-radius: 8px;
+  padding: 22px 24px;
+  margin-bottom: 14px;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
-.github {
-    margin-bottom: 5px;
-    margin-left: 5px;
+.project:hover {
+  background: var(--bg-card-h);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
 }
 
 .project h3 {
-    margin: 25px;
-    margin-bottom: -15px;
-}
-
-.project h5 {
-    margin: 25px;
-    margin-bottom: -15px;
-    text-decoration: solid;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
 }
 
 .project p {
-    margin: 25px;
-    margin-bottom: 5px;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.65;
 }
 
-h1 {
-    color: darkcyan;
-    font-size: 45;
+.project b { color: var(--text); font-weight: 500; }
+
+/* Tech tags */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 
-p {
-    color: gray;
+.tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--accent-border);
 }
+
+/* Card icon links */
+.project-links {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+.project-links a {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  transition: color 0.2s;
+}
+
+.project-links a:hover { color: var(--accent); }
+
+/* ── Global link reset ──────────────────────────────────── */
+
+a { color: var(--text); text-decoration: none; }
+a:hover, a:active, a:visited, a:link { text-decoration: none; }

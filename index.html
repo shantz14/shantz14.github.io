@@ -1,94 +1,128 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
     <head>
-        <meta charSet="utf-8"/>
-        <meta name="viewport" content="width=device-width"/>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="styles.css">
-        <title>Portfolio Home Page</title>
+        <title>Isaac Schwarz</title>
     </head>
 
     <body>
-        
+
         <div class="container">
+
+            <!-- Bio -->
             <div class="bio">
                 <h1>Isaac Schwarz</h1>
                 <h3>Computer Science Student</h3>
-                <p>
-                    Junior at Northern Arizona University. 
-                </p>
-                <p>
-                    Currently working on: A canvas game using Go and Typescript...
-                </p>
+                <p>Junior at Northern Arizona University.</p>
+                <p>Currently working on: NVMe testing with Rust and TLA+... and a reverse proxy in Go.</p>
                 <div class="icons">
-                    <a id = "email" href = "mailto:isaac_schwarz@icloud.com">
-                        <i class="glyphicon glyphicon-envelope"></i>
+                    <a href="mailto:isaac_schwarz@icloud.com" title="Email">
+                        <i class="fa-solid fa-envelope"></i>
                     </a>
-                    <a class = "github" href = "https://github.com/shantz14">
-                        <i class="fab fa-github fa-lg"></i>
+                    <a href="https://github.com/shantz14" title="GitHub">
+                        <i class="fa-brands fa-github"></i>
                     </a>
-                    <a class = "linkedin" href = "https://www.linkedin.com/in/isaac-schwarz-15b55617a/">
-                        <i class="fa fa-linkedin-square"></i>
+                    <a href="https://www.linkedin.com/in/isaac-schwarz-15b55617a/" title="LinkedIn">
+                        <i class="fa-brands fa-linkedin"></i>
                     </a>
                 </div>
             </div>
 
+            <!-- Projects -->
             <div class="projectContainer">
-                <h5>P R O J E C T S</h5>
+                <p class="section-label">Projects</p>
+
                 <div class="project">
-                    <a href="https://nytrpg.isaacschwarz.dev">
+                    <div class="project-header">
                         <div>
-                            <h5>Go, Typescript</h5>
+                            <div class="tags">
+                                <span class="tag">Go</span>
+                                <span class="tag">TypeScript</span>
+                                <span class="tag">Canvas</span>
+                            </div>
                             <h3>NYT RPG</h3>
-                            <p>
-                            - A web based RPG involving New York Times games. <br>
-                            - Backend built with <b>Go (gorilla/websocket)</b>. <br>
-                            - Frontend built with <b>Canvas</b> and <b>Typescript</b>.
-                            </p>
                         </div>
-                    </a>
-                    <a class = "github" href = "https://github.com/shantz14/nytrpg">
-                        <i class="fab fa-github fa-lg"></i>
-                    </a>
+                        <div class="project-links">
+                            <a href="https://nytrpg.isaacschwarz.dev" title="Live demo">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+                            <a href="https://github.com/shantz14/nytrpg" title="GitHub">
+                                <i class="fa-brands fa-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <p>
+                        A web-based RPG built around New York Times games.
+                        Backend powered by <b>Go</b> with gorilla/websocket;
+                        frontend built on <b>Canvas</b> and <b>TypeScript</b>.
+                    </p>
                 </div>
+
                 <div class="project">
-                    <a href="">
+                    <div class="project-header">
                         <div>
-                            <h5>Go</h5>
+                            <div class="tags">
+                                <span class="tag">Go</span>
+                            </div>
                             <h3>HttpGo</h3>
-                            <p>
-                            - Core HTTP functionality written from scratch in <b>Go</b>.<br>
-                            - Multithreaded for handling many requests at once.<br>
-                            - Working on adding reverse proxy functionality.
-                            </p>
                         </div>
-                    </a>
-                    <a class = "github" href = "https://github.com/shantz14/httpgo">
-                        <i class="fab fa-github fa-lg"></i>
-                    </a>
+                        <div class="project-links">
+                            <a href="https://github.com/shantz14/httpgo" title="GitHub">
+                                <i class="fa-brands fa-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <p>
+                        Core HTTP functionality written from scratch in <b>Go</b>.
+                        Multithreaded for handling concurrent requests.
+                        Currently adding reverse proxy functionality.
+                    </p>
                 </div>
+
                 <div class="project">
-                    <a href="">
+                    <div class="project-header">
                         <div>
-                            <h5>Rust</h5>
-                            <h3>Vi</h3>
-                            <p>
-                            - Core motions<br>
-                            - Core modes. <br>
-                            - Compiles to Web Assembly to be used in web applications.
-                            </p>
+                            <div class="tags">
+                                <span class="tag">Rust</span>
+                                <span class="tag">TLA+</span>
+                            </div>
+                            <h3>ConTiNGENT</h3>
                         </div>
-                    </a>
-                    <a class = "github" href = "https://github.com/shantz14/vi">
-                        <i class="fab fa-github fa-lg"></i>
-                    </a>
+                    </div>
+                    <p>
+                        An NVMe testing tool driven by formal specifications. Correct device behavior is described
+                        in <b>TLA+</b>, and a <b>Rust</b> execution engine issues commands against an NVMe
+                        device.
+                    </p>
                 </div>
+
+                <div class="project">
+                    <div class="project-header">
+                        <div>
+                            <div class="tags">
+                                <span class="tag">Rust</span>
+                                <span class="tag">WebAssembly</span>
+                            </div>
+                            <h3>Vi</h3>
+                        </div>
+                        <div class="project-links">
+                            <a href="https://github.com/shantz14/vi" title="GitHub">
+                                <i class="fa-brands fa-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <p>
+                        Vi editor implementation with core motions and modes, written in <b>Rust</b>
+                        and compiled to <b>WebAssembly</b> for use in web applications.
+                    </p>
+                </div>
+
             </div>
         </div>
-
 
     </body>
 
