@@ -70,6 +70,27 @@ body {
   margin-bottom: 6px;
 }
 
+.reading {
+  margin-top: 24px;
+  margin-bottom: 4px;
+}
+
+.reading-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 3.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 6px !important;
+}
+
+.reading p:not(.reading-label) {
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.65;
+  margin-bottom: 2px !important;
+}
+
 .icons {
   display: flex;
   gap: 18px;
