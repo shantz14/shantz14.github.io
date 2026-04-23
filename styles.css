@@ -84,11 +84,21 @@ body {
   margin-bottom: 6px !important;
 }
 
-.reading p:not(.reading-label) {
+.reading-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.reading-title {
   font-size: 0.875rem;
   color: var(--text);
-  line-height: 1.65;
-  margin-bottom: 2px !important;
+}
+
+.reading-author {
+  font-size: 0.75rem;
+  color: var(--text-muted);
 }
 
 .icons {
