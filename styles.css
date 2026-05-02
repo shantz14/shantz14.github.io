@@ -1,29 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&display=swap');
 
 :root {
-  --bg:          #0d0d14;
-  --bg-card:     #15141e;
-  --bg-card-h:   #1c1b2a;
-  --accent:      #22d3ee;
-  --name-color:  #7eadb8;
-  --accent-dim:  rgba(34, 211, 238, 0.12);
-  --accent-border: rgba(34, 211, 238, 0.25);
-  --text:        #e2e8f0;
-  --text-muted:  #64748b;
-  --border:      rgba(255, 255, 255, 0.06);
+  --bg:            #0e0c0a;
+  --accent:        #b89070;
+  --name-color:    #d8d2c4;
+  --accent-dim:    rgba(184, 144, 112, 0.13);
+  --accent-border: rgba(184, 144, 112, 0.20);
+  --text:          #d4cec0;
+  --text-muted:    #9a9288;
+  --border:        rgba(220, 210, 190, 0.08);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+
 body {
-  background: var(--bg);
+  background-color: var(--bg);
   color: var(--text);
-  font-family: 'Inter', Arial, Helvetica, sans-serif;
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
   overflow: hidden;
   height: 100vh;
 }
 
-/* ── Layout ────────────────────────────────────────────── */
+/* ── Layout ─────────────────────────────────────── */
 
 .container {
   height: 100vh;
@@ -33,7 +32,7 @@ body {
   grid-template-areas: "bio projectContainer";
 }
 
-/* ── Bio ────────────────────────────────────────────────── */
+/* ── Bio ─────────────────────────────────────────── */
 
 .bio {
   grid-area: bio;
@@ -47,41 +46,41 @@ body {
 
 .bio h1 {
   color: var(--name-color);
-  font-size: 2.6rem;
-  font-weight: 700;
+  font-size: 2.2rem;
+  font-weight: 600;
   letter-spacing: -0.5px;
   line-height: 1.1;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .bio h3 {
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: 0.74rem;
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 2.5px;
   color: var(--text-muted);
-  margin-bottom: 28px;
+  margin-bottom: 26px;
 }
 
 .bio p {
   font-size: 0.9rem;
   color: var(--text-muted);
   line-height: 1.75;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 
 .reading {
-  margin-top: 24px;
+  margin-top: 22px;
   margin-bottom: 4px;
 }
 
 .reading-label {
   font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 3.5px;
+  font-weight: 400;
+  letter-spacing: 2.5px;
   color: var(--text-muted);
   text-transform: uppercase;
-  margin-bottom: 6px !important;
+  margin-bottom: 8px !important;
 }
 
 .reading-item {
@@ -91,31 +90,37 @@ body {
   margin-bottom: 4px;
 }
 
+.reading-item::before {
+  content: '—';
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
 .reading-title {
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   color: var(--text);
 }
 
 .reading-author {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
 }
 
 .icons {
   display: flex;
   gap: 18px;
-  margin-top: 36px;
+  margin-top: 34px;
 }
 
 .icons a {
   color: var(--text-muted);
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   transition: color 0.2s;
 }
 
 .icons a:hover { color: var(--accent); }
 
-/* ── Projects ───────────────────────────────────────────── */
+/* ── Projects ─────────────────────────────────────── */
 
 .projectContainer {
   grid-area: projectContainer;
@@ -130,71 +135,69 @@ body {
 .projectContainer::-webkit-scrollbar { display: none; }
 
 .section-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 3.5px;
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 2.5px;
   color: var(--text-muted);
   text-transform: uppercase;
   margin-bottom: 28px;
 }
 
-/* ── Project card ───────────────────────────────────────── */
+/* ── Project entry ────────────────────────────────── */
 
 .project {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-left: 2px solid var(--accent);
-  border-radius: 8px;
-  padding: 22px 24px;
-  margin-bottom: 14px;
-  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 20px 0;
+  transition: none;
 }
 
-.project:hover {
-  background: var(--bg-card-h);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-}
+.project:last-child { border-bottom: none; }
 
 .project-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .project h3 {
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text);
 }
 
 .project p {
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   color: var(--text-muted);
-  line-height: 1.65;
+  line-height: 1.72;
 }
 
-.project b { color: var(--text); font-weight: 500; }
+.project b {
+  color: var(--accent);
+  font-weight: 500;
+}
 
-/* Tech tags */
+/* Tags */
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 8px;
+  gap: 8px;
+  margin-bottom: 6px;
 }
 
 .tag {
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  background: var(--accent-dim);
+  font-size: 0.7rem;
   color: var(--accent);
-  padding: 3px 9px;
-  border-radius: 999px;
+  background: var(--accent-dim);
   border: 1px solid var(--accent-border);
+  padding: 2px 7px;
 }
+
+.tag::before { content: '['; }
+.tag::after  { content: ']'; }
 
 /* Card icon links */
 .project-links {
@@ -206,13 +209,26 @@ body {
 
 .project-links a {
   color: var(--text-muted);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   transition: color 0.2s;
 }
 
 .project-links a:hover { color: var(--accent); }
 
-/* ── Global link reset ──────────────────────────────────── */
+/* ── Comments ─────────────────────────────────────── */
+
+.comments-section {
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+  padding-bottom: 60px;
+}
+
+.comments-section .section-label {
+  margin-bottom: 20px;
+}
+
+/* ── Global link reset ───────────────────────────── */
 
 a { color: var(--text); text-decoration: none; }
 a:hover, a:active, a:visited, a:link { text-decoration: none; }
