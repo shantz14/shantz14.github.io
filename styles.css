@@ -7,7 +7,7 @@
   --accent-dim:    rgba(184, 144, 112, 0.13);
   --accent-border: rgba(184, 144, 112, 0.20);
   --text:          #d4cec0;
-  --text-muted:    #9a9288;
+  --text-muted:    #c8c3bc;
   --border:        rgba(220, 210, 190, 0.08);
 }
 
@@ -101,9 +101,15 @@ body {
   color: var(--text);
 }
 
+a.reading-title:hover {
+  color: var(--accent);
+}
+
 .reading-author {
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
+  opacity: 0.6;
+  font-style: italic;
 }
 
 .icons {
@@ -219,14 +225,13 @@ body {
 
 .comments-section {
   margin-top: 40px;
-  padding-top: 28px;
-  border-top: 1px solid var(--border);
   padding-bottom: 60px;
 }
 
 .comments-section .section-label {
-  margin-bottom: 20px;
+  margin-bottom: 4px;
 }
+
 
 /* ── Global link reset ───────────────────────────── */
 

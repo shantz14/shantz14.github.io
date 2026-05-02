@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&display=swap">
+        <title>Isaac Schwarz</title>
+        <style>
+            :root {
+                --bg:         #0e0c0a;
+                --accent:     #b89070;
+                --text:       #d4cec0;
+                --text-muted: #c8c3bc;
+                --border:     rgba(220, 210, 190, 0.08);
+            }
+
+            *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+            body {
+                background: var(--bg);
+                color: var(--text);
+                font-family: 'IBM Plex Mono', 'Courier New', monospace;
+                padding: 64px 24px 96px;
+            }
+
+            .page-wrap {
+                max-width: 700px;
+                margin: 0 auto;
+            }
+
+            .back {
+                display: inline-block;
+                font-size: 0.72rem;
+                letter-spacing: 1px;
+                color: var(--text-muted);
+                text-decoration: none;
+                margin-bottom: 52px;
+            }
+
+            .back:hover { color: var(--accent); }
+
+            /* ── Markdown content ── */
+
+            #content h1 {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: var(--text);
+                line-height: 1.2;
+                margin-bottom: 28px;
+            }
+
+            #content h2 {
+                font-size: 1.05rem;
+                font-weight: 600;
+                color: var(--text);
+                margin-top: 2.2em;
+                margin-bottom: 0.7em;
+            }
+
+            #content h3 {
+                font-size: 0.9rem;
+                font-weight: 600;
+                color: var(--text);
+                margin-top: 1.8em;
+                margin-bottom: 0.5em;
+            }
+
+            #content p {
+                font-size: 0.88rem;
+                color: var(--text-muted);
+                line-height: 1.85;
+                margin-bottom: 1.1em;
+            }
+
+            #content a {
+                color: var(--accent);
+                text-decoration: underline;
+                text-underline-offset: 3px;
+            }
+
+            #content ul, #content ol {
+                padding-left: 1.4em;
+                margin-bottom: 1.1em;
+            }
+
+            #content li {
+                font-size: 0.88rem;
+                color: var(--text-muted);
+                line-height: 1.85;
+                margin-bottom: 0.25em;
+            }
+
+            #content code {
+                font-family: inherit;
+                font-size: 0.85em;
+                color: var(--accent);
+                background: rgba(184, 144, 112, 0.10);
+                padding: 1px 5px;
+            }
+
+            #content pre {
+                background: rgba(220, 210, 190, 0.04);
+                border: 1px solid var(--border);
+                padding: 18px 20px;
+                overflow-x: auto;
+                margin-bottom: 1.2em;
+            }
+
+            #content pre code {
+                background: transparent;
+                padding: 0;
+                color: var(--text);
+                font-size: 0.82rem;
+                line-height: 1.65;
+            }
+
+            #content blockquote {
+                border-left: 2px solid var(--accent);
+                padding-left: 18px;
+                margin: 1.2em 0;
+            }
+
+            #content blockquote p {
+                font-style: italic;
+                color: var(--text-muted);
+            }
+
+            #content hr {
+                border: none;
+                border-top: 1px solid var(--border);
+                margin: 2.2em 0;
+            }
+
+            #content strong { color: var(--text); font-weight: 600; }
+
+            #content img {
+                max-width: 100%;
+                margin: 1.2em 0;
+            }
+
+            .error {
+                font-size: 0.88rem;
+                color: var(--text-muted);
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="page-wrap">
+            <a class="back" href="/">← back</a>
+            <div id="content"></div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <script>
+            const doc = new URLSearchParams(window.location.search).get('doc');
+
+            function stripFrontmatter(md) {
+                return md.startsWith('---')
+                    ? md.replace(/^---[\s\S]*?---\n?/, '')
+                    : md;
+            }
+
+            if (!doc) {
+                document.getElementById('content').innerHTML = '<p class="error">No document specified.</p>';
+            } else {
+                fetch(`/docs/${encodeURIComponent(doc)}.md`)
+                    .then(r => {
+                        if (!r.ok) throw new Error();
+                        return r.text();
+                    })
+                    .then(md => {
+                        document.getElementById('content').innerHTML = marked.parse(stripFrontmatter(md));
+                        const h1 = document.querySelector('#content h1');
+                        if (h1) document.title = `${h1.textContent} — Isaac Schwarz`;
+                    })
+                    .catch(() => {
+                        document.getElementById('content').innerHTML = '<p class="error">Document not found.</p>';
+                    });
+            }
+        </script>
+    </body>
+
+</html>
