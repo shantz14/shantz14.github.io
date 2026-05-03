@@ -11,8 +11,6 @@
 
     <body>
 
-        <canvas id="bg"></canvas>
-
         <div class="container">
 
             <!-- Bio -->
@@ -155,92 +153,6 @@
             </div>
 
         </div>
-
-    <script>
-        (function () {
-            const canvas = document.getElementById('bg');
-            const ctx = canvas.getContext('2d');
-            let W, H, scale;
-
-            function resize() {
-                W = window.innerWidth;
-                H = window.innerHeight;
-                scale = Math.min(W, H) / 58;
-                canvas.width = W;
-                canvas.height = H;
-                ctx.fillStyle = '#0e0c0a';
-                ctx.fillRect(0, 0, W, H);
-            }
-
-            window.addEventListener('resize', resize);
-            resize();
-
-            // Lorenz parameters
-            const σ = 10, ρ = 28, β = 8 / 3, dt = 0.005;
-
-            function step(p) {
-                const dx = σ * (p.y - p.x) * dt;
-                const dy = (p.x * (ρ - p.z) - p.y) * dt;
-                const dz = (p.x * p.y - β * p.z) * dt;
-                p.x += dx; p.y += dy; p.z += dz;
-            }
-
-            // Project 3D Lorenz space onto canvas.
-            // Rotate around the z-axis; slight tilt via the y component.
-            function project(p, a) {
-                const rx = p.x * Math.cos(a) - p.y * Math.sin(a);
-                const ry = p.x * Math.sin(a) + p.y * Math.cos(a);
-                return [
-                    W / 2 + rx * scale,
-                    H / 2 + ((p.z - 25) - ry * 0.2) * scale
-                ];
-            }
-
-            // Four particles starting close together — chaos pulls them apart
-            const particles = [
-                { x:  1.0,  y:  0.0,  z:  0.0 },
-                { x:  1.01, y:  0.0,  z:  0.0 },
-                { x:  1.0,  y:  0.01, z:  0.0 },
-                { x: -1.0,  y:  0.0,  z: 10.0 },
-            ];
-
-            // Warm up — get particles onto the attractor before drawing
-            for (const p of particles)
-                for (let i = 0; i < 2000; i++) step(p);
-
-            let angle = 0, last = 0;
-
-            function frame(now) {
-                requestAnimationFrame(frame);
-                if (now - last < 33) return; // ~30 fps
-                last = now;
-
-                // Fade previous frame toward background
-                ctx.fillStyle = 'rgba(14, 12, 10, 0.018)';
-                ctx.fillRect(0, 0, W, H);
-
-                // Very slowly rotate the view
-                angle += 0.0003;
-
-                ctx.lineWidth = 0.9;
-                ctx.strokeStyle = 'rgba(205, 190, 168, 0.055)';
-
-                for (const p of particles) {
-                    ctx.beginPath();
-                    const [x0, y0] = project(p, angle);
-                    ctx.moveTo(x0, y0);
-                    for (let s = 0; s < 8; s++) {
-                        step(p);
-                        const [x1, y1] = project(p, angle);
-                        ctx.lineTo(x1, y1);
-                    }
-                    ctx.stroke();
-                }
-            }
-
-            requestAnimationFrame(frame);
-        })();
-    </script>
 
     </body>
 

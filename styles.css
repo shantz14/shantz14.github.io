@@ -14,14 +14,6 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 
-#bg {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: 0;
-  pointer-events: none;
-}
-
 body {
   background-color: var(--bg);
   color: var(--text);
@@ -33,8 +25,6 @@ body {
 /* ── Layout ─────────────────────────────────────── */
 
 .container {
-  position: relative;
-  z-index: 1;
   height: 100vh;
   width: 100vw;
   display: grid;
