@@ -233,6 +233,43 @@ a.reading-title:hover {
 }
 
 
+/* ── Mobile ──────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  body {
+    overflow: auto;
+    height: auto;
+  }
+
+  .container {
+    height: auto;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "bio"
+      "projectContainer";
+  }
+
+  .bio {
+    height: auto;
+    justify-content: flex-start;
+    padding: 52px 28px 40px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .bio h1 { font-size: 1.8rem; }
+
+  .projectContainer {
+    height: auto;
+    overflow-y: visible;
+    padding: 40px 28px 60px;
+  }
+
+  .comments-section {
+    padding-bottom: 40px;
+  }
+}
+
 /* ── Global link reset ───────────────────────────── */
 
 a { color: var(--text); text-decoration: none; }
