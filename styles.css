@@ -197,6 +197,27 @@ a.reading-title:hover {
   font-weight: 500;
 }
 
+.project ul {
+  list-style: none;
+  margin-top: 8px;
+}
+
+.project li {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.72;
+  padding-left: 16px;
+  position: relative;
+  margin-bottom: 3px;
+}
+
+.project li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  opacity: 0.5;
+}
+
 /* Tags */
 .tags {
   display: flex;

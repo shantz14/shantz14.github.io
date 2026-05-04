@@ -67,6 +67,10 @@
                         Backend powered by <b>Go</b> with gorilla/websocket;
                         frontend built on <b>Canvas</b> and <b>TypeScript</b>.
                     </p>
+                    <ul>
+                        <li>Concurrent WebSockets for live gameplay features.</li>
+                        <li>REST API for asynchronous features.</li>
+                    </ul>
                 </div>
 
                 <div class="project">
@@ -84,10 +88,13 @@
                         </div>
                     </div>
                     <p>
-                        Core HTTP functionality written from scratch in <b>Go</b>.
+                        HTTP/1.1 functionality written from scratch in <b>Go</b>.
                         Multithreaded handling of concurrent requests.
-                        Currently adding reverse proxy functionality.
                     </p>
+                    <ul>
+                        <li>Working on chunked transfer encoding.</li>
+                        <li>Adding reverse proxy functionality.</li>
+                    </ul>
                 </div>
 
                 <div class="project">
@@ -102,9 +109,14 @@
                     </div>
                     <p>
                         An NVMe testing tool driven by formal specifications. Correct device behavior is described
-                        in <b>TLA+</b>, and a <b>Rust</b> execution engine issues commands against an NVMe
-                        device.
+                        in <b>TLA+</b>, and a <b>Rust</b> execution engine issues commands against an NVMe device.
                     </p>
+                    <ul>
+                        <li><b>TLA+</b> specifications create an abstract representation of the NVMe drive and define behavior to test.</li>
+                        <li><b>TLA+</b> instrumentation uses community module "escape hatches" to interact with the Rust execution engine and incorporate real drive state into the abstract state-space.</li>
+                        <li>The <b>Rust</b> execution engine translates messages from <b>TLA+</b> into nvme-cli commands, executes them, and returns parsed results.</li>
+                        <li>If an invalid state is reached, the <b>TLA+</b> process throws an error and returns a detailed trace showing how it was reached.</li>
+                    </ul>
                 </div>
 
                 <div class="project">
@@ -122,7 +134,7 @@
                         </div>
                     </div>
                     <p>
-                        Vi editor with core motions and modes, written in <b>Rust</b>.
+                        Vi editor clone written in <b>Rust</b>.
                     </p>
                 </div>
 
