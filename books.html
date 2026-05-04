@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&display=swap">
+        <title>Books — Isaac Schwarz</title>
+        <style>
+            :root {
+                --bg:         #0e0c0a;
+                --accent:     #b89070;
+                --text:       #d4cec0;
+                --text-muted: #c8c3bc;
+                --border:     rgba(220, 210, 190, 0.08);
+            }
+
+            *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+            body {
+                background: var(--bg);
+                color: var(--text);
+                font-family: 'IBM Plex Mono', 'Courier New', monospace;
+                padding: 64px 24px 96px;
+            }
+
+            .page-wrap {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            .back {
+                display: inline-block;
+                font-size: 0.72rem;
+                letter-spacing: 1px;
+                color: var(--text-muted);
+                text-decoration: none;
+                margin-bottom: 52px;
+            }
+
+            .back:hover { color: var(--accent); }
+
+            h1 {
+                font-size: 0.9rem;
+                font-weight: 400;
+                letter-spacing: 2.5px;
+                text-transform: uppercase;
+                color: var(--text-muted);
+                margin-bottom: 48px;
+            }
+
+            .category {
+                margin-bottom: 40px;
+            }
+
+            .category-label {
+                font-size: 0.65rem;
+                font-weight: 600;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+                color: var(--accent);
+                margin-bottom: 14px;
+            }
+
+            .book {
+                display: flex;
+                align-items: baseline;
+                gap: 10px;
+                padding: 10px 0;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .book:first-of-type { border-top: 1px solid var(--border); }
+
+            .book-title {
+                font-size: 0.88rem;
+                color: var(--text);
+            }
+
+            a.book-title { text-decoration: none; }
+            a.book-title:hover { color: var(--accent); }
+
+            .book-author {
+                font-size: 0.72rem;
+                color: var(--text-muted);
+                opacity: 0.6;
+                font-style: italic;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="page-wrap">
+            <a class="back" href="/">← back</a>
+            <h1>Books</h1>
+
+            <div class="category">
+                <p class="category-label">Fantasy</p>
+                <div class="book">
+                    <a class="book-title" href="/page.html?doc=The%20Devils">The Devils</a>
+                    <span class="book-author">Joe Abercrombie</span>
+                </div>
+            </div>
+
+            <div class="category">
+                <p class="category-label">Philosophy</p>
+                <div class="book">
+                    <a class="book-title" href="/page.html?doc=Notes%20From%20Underground">Notes From Underground</a>
+                    <span class="book-author">Dostoevsky</span>
+                </div>
+            </div>
+
+        </div>
+    </body>
+
+</html>

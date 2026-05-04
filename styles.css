@@ -105,6 +105,17 @@ a.reading-title:hover {
   color: var(--accent);
 }
 
+.reading-all {
+  display: inline-block;
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-top: 10px;
+  opacity: 0.7;
+}
+
+.reading-all:hover { color: var(--accent); opacity: 1; }
+
 .reading-author {
   font-size: 0.72rem;
   color: var(--text-muted);
