@@ -1,14 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&display=swap');
 
 :root {
-  --bg:            #0e0c0a;
-  --accent:        #b89070;
-  --name-color:    #d8d2c4;
-  --accent-dim:    rgba(184, 144, 112, 0.13);
-  --accent-border: rgba(184, 144, 112, 0.20);
-  --text:          #d4cec0;
-  --text-muted:    #c8c3bc;
-  --border:        rgba(220, 210, 190, 0.08);
+  --bg:            #111111;
+  --accent:        #a5f3fc;
+  --name-color:    #ffffff;
+  --accent-dim:    rgba(165, 243, 252, 0.08);
+  --accent-border: rgba(165, 243, 252, 0.20);
+  --text:          #d4d4d4;
+  --text-muted:    #aaaaaa;
+  --border:        rgba(255, 255, 255, 0.08);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -127,6 +127,7 @@ a.reading-title:hover {
   display: flex;
   gap: 18px;
   margin-top: 34px;
+  margin-left: 6px;
 }
 
 .icons a {
