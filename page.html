@@ -8,11 +8,14 @@
         <title>Isaac Schwarz</title>
         <style>
             :root {
-                --bg:         #0e0c0a;
-                --accent:     #b89070;
-                --text:       #d4cec0;
-                --text-muted: #c8c3bc;
-                --border:     rgba(220, 210, 190, 0.08);
+                --bg:            #111111;
+                --accent:        #a5f3fc;
+                --name-color:    #ffffff;
+                --accent-dim:    rgba(165, 243, 252, 0.08);
+                --accent-border: rgba(165, 243, 252, 0.20);
+                --text:          #d4d4d4;
+                --text-muted:    #aaaaaa;
+                --border:        rgba(255, 255, 255, 0.08);
             }
 
             *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -21,12 +24,31 @@
                 background: var(--bg);
                 color: var(--text);
                 font-family: 'IBM Plex Mono', 'Courier New', monospace;
-                padding: 64px 24px 96px;
+                min-height: 100vh;
             }
 
+            /* ── Lorenz canvas ─────────────────────────────── */
+
+            #lorenz-bg {
+                position: fixed;
+                top: 0; left: 0;
+                width: 100%; height: 100%;
+                z-index: 0;
+                pointer-events: none;
+            }
+
+            /* ── Layout ────────────────────────────────────── */
+
             .page-wrap {
-                max-width: 700px;
+                position: relative;
+                z-index: 1;
+                max-width: 720px;
                 margin: 0 auto;
+                min-height: 100vh;
+                padding: 64px 48px 100px;
+                background: rgba(17, 17, 17, 0.88);
+                border-left: 1px solid var(--border);
+                border-right: 1px solid var(--border);
             }
 
             .back {
@@ -40,12 +62,12 @@
 
             .back:hover { color: var(--accent); }
 
-            /* ── Markdown content ── */
+            /* ── Markdown content ──────────────────────────── */
 
             #content h1 {
                 font-size: 1.5rem;
                 font-weight: 600;
-                color: var(--text);
+                color: var(--name-color);
                 line-height: 1.2;
                 margin-bottom: 28px;
             }
@@ -76,8 +98,11 @@
             #content a {
                 color: var(--accent);
                 text-decoration: underline;
+                text-decoration-color: rgba(165, 243, 252, 0.3);
                 text-underline-offset: 3px;
             }
+
+            #content a:hover { text-decoration-color: var(--accent); }
 
             #content ul, #content ol {
                 padding-left: 1.4em;
@@ -95,12 +120,12 @@
                 font-family: inherit;
                 font-size: 0.85em;
                 color: var(--accent);
-                background: rgba(184, 144, 112, 0.10);
+                background: var(--accent-dim);
                 padding: 1px 5px;
             }
 
             #content pre {
-                background: rgba(220, 210, 190, 0.04);
+                background: rgba(255, 255, 255, 0.04);
                 border: 1px solid var(--border);
                 padding: 18px 20px;
                 overflow-x: auto;
@@ -121,10 +146,7 @@
                 margin: 1.2em 0;
             }
 
-            #content blockquote p {
-                font-style: italic;
-                color: var(--text-muted);
-            }
+            #content blockquote p { font-style: italic; }
 
             #content hr {
                 border: none;
@@ -134,23 +156,130 @@
 
             #content strong { color: var(--text); font-weight: 600; }
 
-            #content img {
-                max-width: 100%;
-                margin: 1.2em 0;
-            }
+            #content img { max-width: 100%; margin: 1.2em 0; }
 
-            .error {
-                font-size: 0.88rem;
-                color: var(--text-muted);
+            .error { font-size: 0.88rem; color: var(--text-muted); }
+
+            /* ── Mobile ────────────────────────────────────── */
+
+            @media (max-width: 768px) {
+                .page-wrap {
+                    padding: 48px 28px 80px;
+                    border: none;
+                }
             }
         </style>
     </head>
 
     <body>
+        <canvas id="lorenz-bg"></canvas>
+
         <div class="page-wrap">
             <a class="back" href="/">← back</a>
             <div id="content"></div>
         </div>
+
+        <script>
+            /* ── Lorenz flow-field background ── */
+            (function () {
+                const canvas = document.getElementById('lorenz-bg');
+                const ctx = canvas.getContext('2d');
+                let W, H;
+
+                function resize() {
+                    W = canvas.width  = window.innerWidth;
+                    H = canvas.height = window.innerHeight;
+                }
+                resize();
+                window.addEventListener('resize', resize);
+
+                const σ = 10, ρ = 28, β = 8 / 3;
+                const COLS = 72, ROWS = 45;
+                const field = new Float32Array(COLS * ROWS);
+
+                function buildField(t) {
+                    for (let r = 0; r < ROWS; r++) {
+                        for (let c = 0; c < COLS; c++) {
+                            const lx = (c / COLS) * 52 - 26;
+                            const lz = (r / ROWS) * 52;
+                            // slowly drifting y slice gives the field its slow shift over time
+                            const ly = Math.sin(t * 0.00022 + c * 0.07) * 11
+                                     + Math.cos(t * 0.00014 + r * 0.05) * 5;
+                            const dx = σ * (ly - lx);
+                            const dz = lx * ly - β * lz;
+                            field[r * COLS + c] = Math.atan2(dz, dx);
+                        }
+                    }
+                }
+
+                function sampleField(px, py) {
+                    const c = Math.max(0, Math.min(COLS - 1, Math.floor((px / W) * COLS)));
+                    const r = Math.max(0, Math.min(ROWS - 1, Math.floor((py / H) * ROWS)));
+                    return field[r * COLS + c];
+                }
+
+                const N = 220, TRAIL = 10, SPEED = 0.55;
+                const C = '165,243,252';
+
+                function spawn() {
+                    return {
+                        x: Math.random() * W,
+                        y: Math.random() * H,
+                        trail: [],
+                        life: 0,
+                        maxLife: 180 + Math.random() * 360,
+                    };
+                }
+
+                const particles = Array.from({ length: N }, spawn);
+
+                let t = 0;
+
+                function frame() {
+                    t++;
+                    if (t % 2 === 0) buildField(t);
+
+                    ctx.fillStyle = 'rgba(17,17,17,0.10)';
+                    ctx.fillRect(0, 0, W, H);
+
+                    for (const p of particles) {
+                        const angle = sampleField(p.x, p.y);
+                        p.x += Math.cos(angle) * SPEED;
+                        p.y += Math.sin(angle) * SPEED;
+                        p.life++;
+
+                        p.trail.push({ x: p.x, y: p.y });
+                        if (p.trail.length > TRAIL) p.trail.shift();
+
+                        if (p.trail.length > 1) {
+                            for (let i = 1; i < p.trail.length; i++) {
+                                const a = ((i / TRAIL) * 0.22).toFixed(2);
+                                ctx.strokeStyle = `rgba(${C},${a})`;
+                                ctx.lineWidth = 0.65;
+                                ctx.beginPath();
+                                ctx.moveTo(p.trail[i - 1].x, p.trail[i - 1].y);
+                                ctx.lineTo(p.trail[i].x, p.trail[i].y);
+                                ctx.stroke();
+                            }
+                        }
+
+                        ctx.fillStyle = `rgba(${C},0.38)`;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, 1.0, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        if (p.x < -8 || p.x > W + 8 || p.y < -8 || p.y > H + 8 || p.life > p.maxLife) {
+                            Object.assign(p, spawn());
+                        }
+                    }
+
+                    requestAnimationFrame(frame);
+                }
+
+                buildField(0);
+                requestAnimationFrame(frame);
+            })();
+        </script>
 
         <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
         <script>
