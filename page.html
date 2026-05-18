@@ -52,12 +52,15 @@
             }
 
             .back {
-                display: inline-block;
+                position: fixed;
+                top: 32px;
+                left: 32px;
+                z-index: 2;
                 font-size: 0.72rem;
                 letter-spacing: 1px;
                 color: var(--text-muted);
                 text-decoration: none;
-                margin-bottom: 52px;
+                font-family: 'IBM Plex Mono', 'Courier New', monospace;
             }
 
             .back:hover { color: var(--accent); }
@@ -174,8 +177,9 @@
     <body>
         <canvas id="lorenz-bg"></canvas>
 
+        <a class="back" href="/">← back</a>
+
         <div class="page-wrap">
-            <a class="back" href="/">← back</a>
             <div id="content"></div>
         </div>
 
@@ -202,12 +206,16 @@
                         for (let c = 0; c < COLS; c++) {
                             const lx = (c / COLS) * 52 - 26;
                             const lz = (r / ROWS) * 52;
-                            // slowly drifting y slice gives the field its slow shift over time
-                            const ly = Math.sin(t * 0.00022 + c * 0.07) * 11
-                                     + Math.cos(t * 0.00014 + r * 0.05) * 5;
+                            // multi-frequency y keeps fixed points shifting faster than particles can converge
+                            const ly = Math.sin(t * 0.0008 + c * 0.12) * 12
+                                     + Math.cos(t * 0.0005 + r * 0.09) * 7
+                                     + Math.sin(t * 0.0013 + (c + r) * 0.07) * 4;
                             const dx = σ * (ly - lx);
                             const dz = lx * ly - β * lz;
-                            field[r * COLS + c] = Math.atan2(dz, dx);
+                            // spatially-varying curl bias breaks residual convergence sinks
+                            const curl = 0.55 * Math.sin(lx * 0.18 + t * 0.0002)
+                                               * Math.cos(lz * 0.12);
+                            field[r * COLS + c] = Math.atan2(dz, dx) + curl;
                         }
                     }
                 }
@@ -228,6 +236,7 @@
                         trail: [],
                         life: 0,
                         maxLife: 180 + Math.random() * 360,
+                        checkX: 0, checkY: 0,
                     };
                 }
 
@@ -267,6 +276,14 @@
                         ctx.beginPath();
                         ctx.arc(p.x, p.y, 1.0, 0, Math.PI * 2);
                         ctx.fill();
+
+                        // every 20 frames check if particle is stuck
+                        if (p.life % 20 === 0) {
+                            if (Math.hypot(p.x - p.checkX, p.y - p.checkY) < 4) {
+                                Object.assign(p, spawn()); continue;
+                            }
+                            p.checkX = p.x; p.checkY = p.y;
+                        }
 
                         if (p.x < -8 || p.x > W + 8 || p.y < -8 || p.y > H + 8 || p.life > p.maxLife) {
                             Object.assign(p, spawn());
