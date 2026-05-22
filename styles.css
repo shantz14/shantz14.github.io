@@ -238,6 +238,12 @@ a.reading-title:hover {
 .tag::before { content: '['; }
 .tag::after  { content: ']'; }
 
+.tag[data-lang="go"]         { color: #5DC9C0; background: rgba(93,201,192,0.08); border-color: rgba(93,201,192,0.22); }
+.tag[data-lang="rust"]       { color: #E8835A; background: rgba(232,131,90,0.08); border-color: rgba(232,131,90,0.22); }
+.tag[data-lang="typescript"] { color: #6B9FD4; background: rgba(107,159,212,0.08); border-color: rgba(107,159,212,0.22); }
+.tag[data-lang="canvas"]     { color: #D4A853; background: rgba(212,168,83,0.08); border-color: rgba(212,168,83,0.22); }
+.tag[data-lang="tlaplus"]    { color: #B59FE0; background: rgba(181,159,224,0.08); border-color: rgba(181,159,224,0.22); }
+
 /* Card icon links */
 .project-links {
   display: flex;
