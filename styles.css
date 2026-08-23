@@ -69,60 +69,6 @@ body {
   margin-bottom: 5px;
 }
 
-.reading {
-  margin-top: 22px;
-  margin-bottom: 4px;
-}
-
-.reading-label {
-  font-size: 0.7rem;
-  font-weight: 400;
-  letter-spacing: 2.5px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  margin-bottom: 8px !important;
-}
-
-.reading-item {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-.reading-item::before {
-  content: '—';
-  color: var(--text-muted);
-  flex-shrink: 0;
-}
-
-.reading-title {
-  font-size: 0.9rem;
-  color: var(--text);
-}
-
-a.reading-title:hover {
-  color: var(--accent);
-}
-
-.reading-all {
-  display: inline-block;
-  font-size: 0.65rem;
-  letter-spacing: 1px;
-  color: var(--text-muted);
-  margin-top: 10px;
-  opacity: 0.7;
-}
-
-.reading-all:hover { color: var(--accent); opacity: 1; }
-
-.reading-author {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  opacity: 0.6;
-  font-style: italic;
-}
-
 .icons {
   display: flex;
   gap: 18px;
@@ -194,8 +140,7 @@ a.reading-title:hover {
 }
 
 .project b {
-  color: var(--accent);
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .project ul {
