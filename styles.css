@@ -188,6 +188,10 @@ body {
 .tag[data-lang="typescript"] { color: #6B9FD4; background: rgba(107,159,212,0.08); border-color: rgba(107,159,212,0.22); }
 .tag[data-lang="canvas"]     { color: #D4A853; background: rgba(212,168,83,0.08); border-color: rgba(212,168,83,0.22); }
 .tag[data-lang="tlaplus"]    { color: #B59FE0; background: rgba(181,159,224,0.08); border-color: rgba(181,159,224,0.22); }
+.tag[data-lang="grpc"]       { color: #7FC97F; background: rgba(127,201,127,0.08); border-color: rgba(127,201,127,0.22); }
+.tag[data-lang="k3s"]        { color: #6B9FD4; background: rgba(107,159,212,0.08); border-color: rgba(107,159,212,0.22); }
+.tag[data-lang="terraform"]  { color: #A78BFA; background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.22); }
+.tag[data-lang="prometheus"] { color: #E86A5A; background: rgba(232,106,90,0.08); border-color: rgba(232,106,90,0.22); }
 
 /* Card icon links */
 .project-links {

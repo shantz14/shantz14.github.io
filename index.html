@@ -16,9 +16,9 @@
             <!-- Bio -->
             <div class="bio">
                 <h1>Isaac Schwarz</h1>
-                <h3>Computer Science Student</h3>
-                <p>Senior at Northern Arizona University.</p>
-                <p>Currently working on: NVMe testing with Rust and TLA+... and a reverse proxy in Go.</p>
+                <h3>Software Engineer</h3>
+                <p>B.S. Computer Science, Cum Laude, Northern Arizona University.</p>
+                <p>Currently working on: a container orchestrator in Go and Rust... and a reverse proxy in Go.</p>
                 <div class="icons">
                     <a href="mailto:isaacschwarz11@gmail.com" title="Email">
                         <i class="fa-solid fa-envelope"></i>
@@ -50,6 +50,33 @@
                         <div>
                             <div class="tags">
                                 <span class="tag" data-lang="go">Go</span>
+                                <span class="tag" data-lang="rust">Rust</span>
+                                <span class="tag" data-lang="grpc">gRPC</span>
+                            </div>
+                            <h3>Dinghy</h3>
+                        </div>
+                        <div class="project-links">
+                            <a href="https://github.com/shantz14/dinghy" title="GitHub">
+                                <i class="fa-brands fa-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <p>
+                        A container orchestrator modeled on Kubernetes architecture. Control plane written in <b>Go</b>,
+                        cluster state stored in a Raft-replicated key-value store written in <b>Rust</b>.
+                    </p>
+                    <ul>
+                        <li>Scheduler places containers onto nodes; controllers run reconciliation loops to drive the cluster toward its declared desired state.</li>
+                        <li>Distributed key-value store in <b>Rust</b>, replicated with the <b>Raft</b> consensus algorithm.</li>
+                        <li>The <b>Go</b> control plane and <b>Rust</b> store communicate over <b>gRPC</b>, with the interface defined in Protocol Buffers.</li>
+                    </ul>
+                </div>
+
+                <div class="project">
+                    <div class="project-header">
+                        <div>
+                            <div class="tags">
+                                <span class="tag" data-lang="go">Go</span>
                                 <span class="tag" data-lang="typescript">TypeScript</span>
                                 <span class="tag" data-lang="canvas">Canvas</span>
                             </div>
@@ -71,7 +98,8 @@
                     </p>
                     <ul>
                         <li>Concurrent WebSockets for live gameplay features.</li>
-                        <li>REST API for asynchronous features.</li>
+                        <li>REST API backed by SQLite for asynchronous features.</li>
+                        <li>Containerized with Docker and deployed on AWS through a GitHub Actions CI pipeline.</li>
                     </ul>
                 </div>
 
@@ -118,6 +146,26 @@
                         <li><b>TLA+</b> instrumentation uses community module "escape hatches" to interact with the Rust execution engine and incorporate real drive state into the abstract state-space.</li>
                         <li>The <b>Rust</b> execution engine translates messages from <b>TLA+</b> into nvme-cli commands, executes them, and returns parsed results.</li>
                         <li>If an invalid state is reached, the <b>TLA+</b> process throws an error and returns a detailed trace showing how it was reached.</li>
+                    </ul>
+                </div>
+
+                <div class="project">
+                    <div class="project-header">
+                        <div>
+                            <div class="tags">
+                                <span class="tag" data-lang="k3s">k3s</span>
+                                <span class="tag" data-lang="terraform">Terraform</span>
+                                <span class="tag" data-lang="prometheus">Prometheus</span>
+                            </div>
+                            <h3>Homelab</h3>
+                        </div>
+                    </div>
+                    <p>
+                        A virtualized Linux homelab on <b>Proxmox</b> hosting a <b>Kubernetes</b> (k3s) cluster,
+                        with infrastructure managed as code in <b>Terraform</b>.
+                    </p>
+                    <ul>
+                        <li>Monitoring and alerting for the cluster and its services with <b>Prometheus</b>, <b>Grafana</b> dashboards, and Alertmanager.</li>
                     </ul>
                 </div>
 
