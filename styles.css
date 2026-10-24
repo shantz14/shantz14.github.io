@@ -69,6 +69,19 @@ body {
   margin-bottom: 5px;
 }
 
+.resume-link {
+  align-self: flex-start;
+  margin-top: 22px;
+  font-size: 0.9rem;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent-border);
+  padding-bottom: 2px;
+  transition: border-color 0.2s;
+}
+
+.resume-link:hover { border-color: var(--accent); }
+
 .icons {
   display: flex;
   gap: 18px;
