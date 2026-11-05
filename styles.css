@@ -205,6 +205,8 @@ body {
 .tag[data-lang="k3s"]        { color: #6B9FD4; background: rgba(107,159,212,0.08); border-color: rgba(107,159,212,0.22); }
 .tag[data-lang="terraform"]  { color: #A78BFA; background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.22); }
 .tag[data-lang="prometheus"] { color: #E86A5A; background: rgba(232,106,90,0.08); border-color: rgba(232,106,90,0.22); }
+.tag[data-lang="ansible"]    { color: #E07AA8; background: rgba(224,122,168,0.08); border-color: rgba(224,122,168,0.22); }
+.tag[data-lang="flux"]       { color: #5BB8E8; background: rgba(91,184,232,0.08); border-color: rgba(91,184,232,0.22); }
 
 /* Card icon links */
 .project-links {
