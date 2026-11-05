@@ -109,6 +109,28 @@
                     <div class="project-header">
                         <div>
                             <div class="tags">
+                                <span class="tag" data-lang="rust">Rust</span>
+                                <span class="tag" data-lang="tlaplus">TLA+</span>
+                            </div>
+                            <h3>ConTiNGENT</h3>
+                        </div>
+                    </div>
+                    <p>
+                        An NVMe testing tool for <b>Sandisk</b> driven by formal specifications. Correct device behavior is described
+                        in <b>TLA+</b>, and a <b>Rust</b> execution engine issues commands against an NVMe device.
+                    </p>
+                    <ul>
+                        <li><b>TLA+</b> specifications create an abstract representation of the NVMe drive and define behavior to test.</li>
+                        <li><b>TLA+</b> instrumentation uses community module "escape hatches" to interact with the Rust execution engine and incorporate real drive state into the abstract state-space.</li>
+                        <li>The <b>Rust</b> execution engine translates messages from <b>TLA+</b> into nvme-cli commands, executes them, and returns parsed results.</li>
+                        <li>If an invalid state is reached, the <b>TLA+</b> process throws an error and returns a detailed trace showing how it was reached.</li>
+                    </ul>
+                </div>
+
+                <div class="project">
+                    <div class="project-header">
+                        <div>
+                            <div class="tags">
                                 <span class="tag" data-lang="go">Go</span>
                                 <span class="tag" data-lang="typescript">TypeScript</span>
                                 <span class="tag" data-lang="canvas">Canvas</span>
@@ -157,28 +179,6 @@
                     <ul>
                         <li>Working on chunked transfer encoding.</li>
                         <li>Adding reverse proxy functionality.</li>
-                    </ul>
-                </div>
-
-                <div class="project">
-                    <div class="project-header">
-                        <div>
-                            <div class="tags">
-                                <span class="tag" data-lang="rust">Rust</span>
-                                <span class="tag" data-lang="tlaplus">TLA+</span>
-                            </div>
-                            <h3>ConTiNGENT</h3>
-                        </div>
-                    </div>
-                    <p>
-                        An NVMe testing tool driven by formal specifications. Correct device behavior is described
-                        in <b>TLA+</b>, and a <b>Rust</b> execution engine issues commands against an NVMe device.
-                    </p>
-                    <ul>
-                        <li><b>TLA+</b> specifications create an abstract representation of the NVMe drive and define behavior to test.</li>
-                        <li><b>TLA+</b> instrumentation uses community module "escape hatches" to interact with the Rust execution engine and incorporate real drive state into the abstract state-space.</li>
-                        <li>The <b>Rust</b> execution engine translates messages from <b>TLA+</b> into nvme-cli commands, executes them, and returns parsed results.</li>
-                        <li>If an invalid state is reached, the <b>TLA+</b> process throws an error and returns a detailed trace showing how it was reached.</li>
                     </ul>
                 </div>
 
