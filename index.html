@@ -6,7 +6,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
         <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="comments.css">
+        <script src="comments.js" defer></script>
         <title>Isaac Schwarz</title>
+        <link rel="stylesheet" href="/palette.css">
+        <script src="/palette.js" defer></script>
     </head>
 
     <body>
@@ -44,7 +48,7 @@
 
             <!-- Projects -->
             <div class="projectContainer">
-                <p class="section-label">Projects</p>
+                <p class="section-label" id="projects">Projects</p>
 
                 <div class="project">
                     <div class="project-header">
@@ -192,21 +196,7 @@
             <!-- Comments -->
             <div class="comments-section">
                 <p class="section-label">Comments</p>
-<script src="https://giscus.app/client.js"
-                    data-repo="shantz14/shantz14.github.io"
-                    data-repo-id="R_kgDOObhkGA"
-                    data-category="General"
-                    data-category-id="DIC_kwDOObhkGM4C8K_T"
-                    data-mapping="url"
-                    data-strict="0"
-                    data-reactions-enabled="1"
-                    data-emit-metadata="0"
-                    data-input-position="top"
-                    data-theme="transparent_dark"
-                    data-lang="en"
-                    crossorigin="anonymous"
-                    async>
-                </script>
+                <div id="comments" class="gc"></div>
             </div>
 
             </div>

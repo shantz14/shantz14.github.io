@@ -1,0 +1,91 @@
+/* ── Command palette ─────────────────────────────── */
+/* Uses each page's own theme variables, so it matches every page. */
+
+.cp-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 12vh 16px 16px;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.cp-backdrop[hidden] { display: none; }
+
+.cp-panel {
+  width: 100%;
+  max-width: 560px;
+  overflow: hidden;
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  color: var(--text, #d4d4d4);
+  background: var(--bg, #111111);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+}
+
+.cp-input {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--text, #d4d4d4);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  outline: none;
+}
+
+.cp-input::placeholder { color: var(--text-muted, #aaaaaa); opacity: 0.6; }
+
+.cp-list {
+  max-height: min(320px, 50vh);
+  overflow-y: auto;
+  padding: 6px;
+  list-style: none;
+  scrollbar-width: thin;
+}
+
+.cp-item {
+  padding: 8px 10px;
+  font-size: 0.88rem;
+  color: var(--text-muted, #aaaaaa);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cp-item[aria-selected="true"] {
+  color: var(--text, #d4d4d4);
+  background: var(--accent-dim, rgba(255, 255, 255, 0.06));
+}
+
+.cp-match {
+  font-weight: 600;
+  color: var(--accent, #a5f3fc);
+}
+
+.cp-empty {
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  color: var(--text-muted, #aaaaaa);
+  opacity: 0.7;
+}
+
+.cp-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  padding: 8px 16px;
+  font-size: 0.7rem;
+  color: var(--text-muted, #aaaaaa);
+  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+
+.cp-footer kbd {
+  margin-right: 4px;
+  font-family: inherit;
+  color: var(--text, #d4d4d4);
+}
