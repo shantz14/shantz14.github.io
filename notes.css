@@ -1,0 +1,329 @@
+/* Shared look for the digital garden pages (formerly page.html). */
+:root {
+    --bg:            #111111;
+    --accent:        #a5f3fc;
+    --name-color:    #ffffff;
+    --accent-dim:    rgba(165, 243, 252, 0.08);
+    --accent-border: rgba(165, 243, 252, 0.20);
+    --text:          #d4d4d4;
+    --text-muted:    #aaaaaa;
+    --border:        rgba(255, 255, 255, 0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', 'Courier New', monospace;
+    min-height: 100vh;
+}
+
+/* ── Lorenz canvas ─────────────────────────────── */
+
+#lorenz-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* ── Layout ────────────────────────────────────── */
+
+.page-wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: 64px 48px 100px;
+    background: rgba(17, 17, 17, 0.88);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+}
+
+.back {
+    position: fixed;
+    top: 32px;
+    left: 32px;
+    z-index: 2;
+    font-size: 0.72rem;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', 'Courier New', monospace;
+}
+
+.back:hover { color: var(--accent); }
+
+/* ── Markdown content ──────────────────────────── */
+
+#content h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--name-color);
+    line-height: 1.2;
+    margin-bottom: 28px;
+}
+
+#content h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 2.2em;
+    margin-bottom: 0.7em;
+}
+
+#content h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 1.8em;
+    margin-bottom: 0.5em;
+}
+
+#content p {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.85;
+    margin-bottom: 1.1em;
+}
+
+#content a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-color: rgba(165, 243, 252, 0.3);
+    text-underline-offset: 3px;
+}
+
+#content a:hover { text-decoration-color: var(--accent); }
+
+#content ul, #content ol {
+    padding-left: 1.4em;
+    margin-bottom: 1.1em;
+}
+
+#content li {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.85;
+    margin-bottom: 0.25em;
+}
+
+#content code {
+    font-family: inherit;
+    font-size: 0.85em;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 1px 5px;
+}
+
+#content pre {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+    overflow-x: auto;
+    margin-bottom: 1.2em;
+}
+
+#content pre code {
+    background: transparent;
+    padding: 0;
+    color: var(--text);
+    font-size: 0.82rem;
+    line-height: 1.65;
+}
+
+#content blockquote {
+    border-left: 2px solid var(--accent);
+    padding-left: 18px;
+    margin: 1.2em 0;
+}
+
+#content blockquote p { font-style: italic; }
+
+#content hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.2em 0;
+}
+
+#content strong { color: var(--text); font-weight: 600; }
+
+#content img { max-width: 100%; margin: 1.2em 0; }
+
+.error { font-size: 0.88rem; color: var(--text-muted); }
+
+/* ── Garden: note pages ─────────────────────────── */
+
+.note-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: -14px 0 32px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.note-meta time { opacity: 0.7; margin-right: 4px; }
+
+.tag {
+    font-size: 0.68rem;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid var(--accent-border);
+    padding: 1px 7px;
+    text-decoration: none;
+}
+
+a.tag:hover { border-color: var(--accent); }
+
+.note-source {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin: -20px 0 32px;
+    overflow-wrap: anywhere;
+}
+
+.note-source a { color: var(--accent); }
+
+#content a.dead-link, #content .dead-link {
+    color: var(--text-muted);
+    opacity: 0.55;
+    text-decoration: none;
+    cursor: default;
+}
+
+#content h4 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 1.6em;
+    margin-bottom: 0.4em;
+}
+
+#content table {
+    border-collapse: collapse;
+    margin-bottom: 1.2em;
+    font-size: 0.8rem;
+    display: block;
+    overflow-x: auto;
+}
+
+#content th, #content td {
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    text-align: left;
+    color: var(--text-muted);
+}
+
+#content th { color: var(--text); font-weight: 600; }
+
+#content li > ul, #content li > ol { margin-bottom: 0; }
+
+#content input[type=checkbox] { margin-right: 6px; accent-color: var(--accent); }
+
+#content p:empty { display: none; }
+
+.backlinks {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+}
+
+.section-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+}
+
+/* ── Garden: index (styled after the old books list) ── */
+
+.garden-title {
+    font-size: 0.9rem;
+    font-weight: 400;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+}
+
+.hint {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    opacity: 0.7;
+    margin-bottom: 48px;
+}
+
+.hint kbd, .empty-state kbd {
+    font-family: inherit;
+    font-size: 0.65rem;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 0 5px;
+}
+
+.hint button {
+    font: inherit;
+    color: var(--accent);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: var(--accent-border);
+    text-underline-offset: 3px;
+}
+
+.category { margin-bottom: 40px; scroll-margin-top: 32px; }
+
+.row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.section-label + .row { border-top: 1px solid var(--border); }
+
+.row-title {
+    font-size: 0.88rem;
+    color: var(--text);
+    text-decoration: none;
+}
+
+.row-title:hover { color: var(--accent); }
+
+.row-tags {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    opacity: 0.6;
+    font-style: italic;
+    text-align: right;
+}
+
+.empty-state { font-size: 0.88rem; color: var(--text-muted); }
+
+/* ── Mobile ────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .page-wrap {
+        padding: 64px 28px 80px;
+        border: none;
+    }
+
+    /* Scroll away with the page instead of floating over the text. */
+    .back {
+        position: absolute;
+        top: 24px;
+        left: 28px;
+    }
+}

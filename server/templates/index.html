@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        {{template "head"}}
+        <title>Notes — Isaac Schwarz</title>
+    </head>
+
+    <body>
+        <canvas id="lorenz-bg"></canvas>
+
+        <a class="back" href="/">← back</a>
+
+        <div class="page-wrap">
+            <h1 class="garden-title">Notes</h1>
+            <p class="hint">{{template "shortcuts"}}</p>
+
+            {{- range $cat := .Categories}}
+            <section class="category" id="{{.Key}}">
+                <p class="section-label">{{.Label}}</p>
+                {{- range $cat.Notes}}
+                <div class="row">
+                    <a class="row-title" href="/notes/{{.Slug}}">{{.Title}}</a>
+                    {{- with rowTags $cat.Key .Tags}}<span class="row-tags">{{.}}</span>{{end}}
+                </div>
+                {{- end}}
+            </section>
+            {{- else}}
+            <p class="empty-state">No public notes yet.</p>
+            {{- end}}
+        </div>
+    </body>
+
+</html>

@@ -1,5 +1,6 @@
 ---
 tags:
+  - public
   - philosophy
   - books
 created_on: 04-21-2026

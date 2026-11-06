@@ -1,5 +1,6 @@
 ---
 tags:
+  - public
   - books
 created_on: 05-18-2026
 related:

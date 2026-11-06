@@ -9,11 +9,12 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags=
 
 FROM gcr.io/distroless/static-debian12:nonroot
 COPY --from=build /server /server
-COPY index.html books.html page.html styles.css comments.css comments.js palette.css palette.js resume.pdf /site/
-COPY docs/ /site/docs/
+COPY index.html styles.css comments.css comments.js palette.css palette.js notes.css lorenz.js graph.js resume.pdf /site/
+# Only notes tagged `public` ever reach garden/ (see garden.sh).
+COPY garden/ /site/garden/
 # The SQLite database lives here; mount a volume so comments survive restarts.
 COPY --from=build --chown=nonroot:nonroot /tmp /data
 VOLUME /data
-ENV STATIC_DIR=/site DB_PATH=/data/comments.db ADDR=:8080
+ENV STATIC_DIR=/site GARDEN_DIR=/site/garden DB_PATH=/data/comments.db ADDR=:8080
 EXPOSE 8080
 ENTRYPOINT ["/server"]

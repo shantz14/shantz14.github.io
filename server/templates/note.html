@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        {{template "head"}}
+        <title>{{if .Missing}}Not found{{else}}{{.Note.Title}}{{end}} — Isaac Schwarz</title>
+    </head>
+
+    <body>
+        <canvas id="lorenz-bg"></canvas>
+
+        <a class="back" href="/notes/">← notes</a>
+
+        <div class="page-wrap">
+            <article id="content">
+            {{- if .Missing}}
+                <h1>Not found</h1>
+                <p class="empty-state">There's no public note here. Press <kbd>ctrl o</kbd> to find one, or go back to <a href="/notes/">all notes</a>.</p>
+            {{- else}}
+            {{- with .Note}}
+                <h1>{{.Title}}</h1>
+                {{- if or .Created .Tags}}
+                <div class="note-meta">
+                    {{- if .Created}}<time>{{.Created}}</time>{{end}}
+                    {{- range .Tags}}<a class="tag" href="/notes/#{{topTag .}}">#{{.}}</a>{{end}}
+                </div>
+                {{- end}}
+                {{- if .Source}}
+                <p class="note-source">source: <a href="{{.Source}}" rel="nofollow noopener" target="_blank">{{.Source}}</a></p>
+                {{- end}}
+                {{.HTML}}
+                {{- if .Backlinks}}
+                <section class="backlinks">
+                    <p class="section-label">Linked from</p>
+                    {{- range .Backlinks}}
+                    <div class="row"><a class="row-title" href="/notes/{{.Slug}}">{{.Title}}</a></div>
+                    {{- end}}
+                </section>
+                {{- end}}
+            {{- end}}
+            {{- end}}
+            </article>
+        </div>
+    </body>
+
+</html>

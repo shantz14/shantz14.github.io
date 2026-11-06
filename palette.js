@@ -1,4 +1,6 @@
-// Command palette: Ctrl-P (Cmd-P on Mac) opens a fuzzy-filtered list of site commands.
+// Command palette. Ctrl-P (Cmd-P on Mac) opens a fuzzy-filtered list of site commands; Ctrl-O opens
+// the same palette as a note finder over the digital garden. In the note finder, typing ">" first
+// switches to commands.
 (() => {
   const onHome = location.pathname === '/' || location.pathname === '/index.html';
 
@@ -10,24 +12,52 @@
   };
   const go = (url) => () => { location.href = url; };
 
+  // The garden index (notes, tags, links) is fetched once, on first use, and shared with graph.js.
+  let gardenPromise = null;
+  window.loadGarden = () => {
+    gardenPromise ??= fetch('/api/garden')
+      .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .catch((err) => { gardenPromise = null; throw err; });
+    return gardenPromise;
+  };
+
+  // graph.js is only downloaded when someone opens the graph.
+  let graphScript = null;
+  function openGraph() {
+    graphScript ??= new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = '/graph.js';
+      s.onload = resolve;
+      s.onerror = () => { graphScript = null; reject(); };
+      document.head.append(s);
+    });
+    graphScript.then(() => window.GardenGraph.open());
+  }
+
   const COMMANDS = [
+    { name: 'Search Notes', run: () => open('notes') },
+    { name: 'Open Graph View', run: openGraph },
     { name: 'Go to Home', run: go('/') },
+    { name: 'Go to Notes', run: go('/notes/') },
+    { name: 'Go to Books', run: go('/notes/#books') },
     { name: 'Go to Projects', run: section('projects') },
     { name: 'Go to Comments', run: section('comments') },
-    { name: 'Go to Books', run: go('/books.html') },
     { name: 'Open Resume', run: go('/resume.pdf') },
   ];
 
-  const RECENT_KEY = 'palette-recent';
+  const MODES = {
+    commands: { placeholder: 'Type a command...', empty: 'No commands found.', recentKey: 'palette-recent' },
+    notes: { placeholder: 'Find a note...', empty: 'No notes found.', recentKey: 'palette-recent-notes' },
+  };
 
-  function loadRecent() {
-    try { return JSON.parse(localStorage.getItem(RECENT_KEY)) || []; } catch { return []; }
+  function loadRecent(key) {
+    try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; }
   }
 
-  function saveRecent(name) {
+  function saveRecent(key, id) {
     try {
-      const recent = [name, ...loadRecent().filter((n) => n !== name)].slice(0, 10);
-      localStorage.setItem(RECENT_KEY, JSON.stringify(recent));
+      const recent = [id, ...loadRecent(key).filter((n) => n !== id)].slice(0, 10);
+      localStorage.setItem(key, JSON.stringify(recent));
     } catch { /* storage unavailable */ }
   }
 
@@ -51,23 +81,50 @@
     return positions.length === q.length ? { score, positions } : null;
   }
 
+  // Items for the current mode: { id, name, detail?, run }.
+  function sourceItems() {
+    if (mode === 'commands') return COMMANDS.map((c) => ({ ...c, id: c.name }));
+    if (!garden) return [];
+    return garden.notes.map((n) => ({
+      id: n.slug,
+      name: n.title,
+      aliases: n.aliases,
+      detail: n.tags.map((t) => '#' + t).join(' '),
+      run: go('/notes/' + n.slug),
+    }));
+  }
+
   function results(query) {
+    const all = sourceItems();
     if (!query.trim()) {
-      const recent = loadRecent();
-      const rank = (c) => { const i = recent.indexOf(c.name); return i < 0 ? Infinity : i; };
-      // Array sort is stable, so non-recent commands keep their list order.
-      return [...COMMANDS].sort((a, b) => rank(a) - rank(b)).map((cmd) => ({ cmd, positions: [] }));
+      const recent = loadRecent(MODES[mode].recentKey);
+      const rank = (item) => { const i = recent.indexOf(item.id); return i < 0 ? Infinity : i; };
+      // Array sort is stable, so non-recent items keep their list order.
+      return [...all].sort((a, b) => rank(a) - rank(b)).map((item) => ({ item, positions: [] }));
     }
-    return COMMANDS
-      .map((cmd) => ({ cmd, m: fuzzy(query, cmd.name) }))
+    return all
+      .map((item) => {
+        let m = fuzzy(query, item.name);
+        let via = null;
+        // A note also matches through its aliases, shown alongside the title.
+        for (const alias of item.aliases || []) {
+          const am = fuzzy(query, alias);
+          if (am && (!m || am.score > m.score + 4)) { m = { score: am.score, positions: [] }; via = alias; }
+        }
+        // Failing that, a tag containing the query (e.g. "books") lists its notes below title matches.
+        const q = query.trim().toLowerCase();
+        if (!m && item.detail && item.detail.toLowerCase().includes(q)) m = { score: -1, positions: [] };
+        return { item, m, via };
+      })
       .filter((r) => r.m)
       .sort((a, b) => b.m.score - a.m.score)
-      .map(({ cmd, m }) => ({ cmd, positions: m.positions }));
+      .map(({ item, m, via }) => ({ item, positions: m.positions, via }));
   }
 
   // ── DOM ──
 
   let backdrop, input, list, items = [], selected = 0, returnFocus = null;
+  let mode = 'commands', garden = null, gardenError = false;
 
   function build() {
     backdrop = document.createElement('div');
@@ -83,13 +140,19 @@
     input = document.createElement('input');
     input.className = 'cp-input';
     input.type = 'text';
-    input.placeholder = 'Type a command...';
     input.autocomplete = 'off';
     input.spellcheck = false;
     input.setAttribute('role', 'combobox');
     input.setAttribute('aria-expanded', 'true');
     input.setAttribute('aria-controls', 'cp-list');
-    input.addEventListener('input', () => { selected = 0; render(); });
+    input.addEventListener('input', () => {
+      if (mode === 'notes' && input.value.startsWith('>')) {
+        input.value = input.value.slice(1);
+        setMode('commands');
+      }
+      selected = 0;
+      render();
+    });
     input.addEventListener('keydown', onKey);
 
     list = document.createElement('ul');
@@ -115,44 +178,82 @@
     document.body.append(backdrop);
   }
 
-  function render() {
-    items = results(input.value);
-    list.replaceChildren();
+  function setMode(m) {
+    mode = m;
+    input.placeholder = MODES[m].placeholder;
+    if (m === 'notes' && !garden) {
+      window.loadGarden()
+        .then((g) => { garden = g; gardenError = false; })
+        .catch(() => { gardenError = true; })
+        .finally(() => { if (!backdrop.hidden && mode === 'notes') render(); });
+    }
+  }
 
+  function message(text) {
+    const li = document.createElement('li');
+    li.className = 'cp-empty';
+    li.textContent = text;
+    list.append(li);
+    input.removeAttribute('aria-activedescendant');
+  }
+
+  // Appends text to el, wrapping the characters at `positions` in highlight spans.
+  function highlighted(el, text, positions) {
+    const hits = new Set(positions);
+    let run = '', runIsMatch = false;
+    const flush = () => {
+      if (!run) return;
+      if (runIsMatch) {
+        const mark = document.createElement('span');
+        mark.className = 'cp-match';
+        mark.textContent = run;
+        el.append(mark);
+      } else {
+        el.append(run);
+      }
+      run = '';
+    };
+    [...text].forEach((ch, j) => {
+      if (hits.has(j) !== runIsMatch) { flush(); runIsMatch = hits.has(j); }
+      run += ch;
+    });
+    flush();
+  }
+
+  function render() {
+    list.replaceChildren();
+    if (mode === 'notes' && !garden) {
+      message(gardenError ? 'Could not load notes.' : 'Loading notes...');
+      items = [];
+      return;
+    }
+    items = results(input.value);
     if (!items.length) {
-      const empty = document.createElement('li');
-      empty.className = 'cp-empty';
-      empty.textContent = 'No commands found.';
-      list.append(empty);
-      input.removeAttribute('aria-activedescendant');
+      message(MODES[mode].empty);
       return;
     }
 
-    items.forEach(({ cmd, positions }, i) => {
+    items.forEach(({ item, positions, via }, i) => {
       const li = document.createElement('li');
       li.className = 'cp-item';
       li.id = 'cp-item-' + i;
       li.setAttribute('role', 'option');
-      // Highlight matched characters, grouping consecutive ones into a single span.
-      const hits = new Set(positions);
-      let run = '', runIsMatch = false;
-      const flush = () => {
-        if (!run) return;
-        if (runIsMatch) {
-          const mark = document.createElement('span');
-          mark.className = 'cp-match';
-          mark.textContent = run;
-          li.append(mark);
-        } else {
-          li.append(run);
-        }
-        run = '';
-      };
-      [...cmd.name].forEach((ch, j) => {
-        if (hits.has(j) !== runIsMatch) { flush(); runIsMatch = hits.has(j); }
-        run += ch;
-      });
-      flush();
+      const name = document.createElement('span');
+      name.className = 'cp-name';
+      highlighted(name, item.name, positions);
+      if (via) {
+        const alias = document.createElement('span');
+        alias.className = 'cp-alias';
+        alias.textContent = ' ← ' + via;
+        name.append(alias);
+      }
+      li.append(name);
+      if (item.detail) {
+        const detail = document.createElement('span');
+        detail.className = 'cp-detail';
+        detail.textContent = item.detail;
+        li.append(detail);
+      }
       li.addEventListener('mousemove', () => { if (selected !== i) select(i); });
       li.addEventListener('click', () => { select(i); runSelected(); });
       list.append(li);
@@ -176,11 +277,11 @@
   }
 
   function runSelected() {
-    const item = items[selected];
-    if (!item) return;
-    saveRecent(item.cmd.name);
+    const entry = items[selected];
+    if (!entry) return;
+    saveRecent(MODES[mode].recentKey, entry.item.id);
     close(false);
-    item.cmd.run();
+    entry.item.run();
   }
 
   function onKey(e) {
@@ -197,11 +298,12 @@
     }
   }
 
-  function open() {
+  function open(m = 'commands') {
     if (!backdrop) build();
-    returnFocus = document.activeElement;
+    if (!backdrop.contains(document.activeElement)) returnFocus = document.activeElement;
     input.value = '';
     selected = 0;
+    setMode(m);
     render();
     backdrop.hidden = false;
     input.focus();
@@ -213,13 +315,21 @@
     returnFocus = null;
   }
 
-  // Capture phase, so Ctrl-P wins over the browser's print dialog and any focused widget.
+  // Capture phase, so Ctrl-P/Ctrl-O win over the browser's print/open dialogs and any focused widget.
+  // Pressing a palette's shortcut again closes it; pressing the other one switches mode.
   window.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === 'p') {
-      e.preventDefault();
-      e.stopPropagation();
-      if (backdrop && !backdrop.hidden) close();
-      else open();
-    }
+    if (!(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey) return;
+    const key = e.key.toLowerCase();
+    const want = key === 'p' ? 'commands' : key === 'o' ? 'notes' : null;
+    if (!want) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (backdrop && !backdrop.hidden && mode === want) close();
+    else open(want);
   }, true);
+
+  // Any element with data-open-graph (e.g. on the notes index) opens the graph.
+  document.addEventListener('click', (e) => {
+    if (e.target.closest?.('[data-open-graph]')) { e.preventDefault(); openGraph(); }
+  });
 })();

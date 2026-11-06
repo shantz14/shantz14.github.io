@@ -10,7 +10,9 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
+	"sync/atomic"
 	"syscall"
 	"time"
 )
@@ -26,6 +28,8 @@ type Server struct {
 	clientSecret string
 	ownerLogin   string
 	staticDir    string
+	gardenDir    string
+	garden       atomic.Pointer[Garden]
 }
 
 func env(key, fallback string) string {
@@ -45,7 +49,7 @@ func hiddenPath(p string) bool {
 		}
 	}
 	switch segs[0] {
-	case "server", "Dockerfile", "watch.sh", "CNAME", "data":
+	case "server", "Dockerfile", "garden", "garden.sh", "CNAME", "data":
 		return true
 	}
 	return false
@@ -64,6 +68,19 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /auth/login", s.handleLogin)
 	mux.HandleFunc("GET /auth/callback", s.handleCallback)
 	mux.HandleFunc("POST /auth/logout", s.guard(s.handleLogout))
+
+	mux.HandleFunc("GET /notes/{$}", s.handleGardenIndex)
+	mux.HandleFunc("GET /notes/{slug}", s.handleNote)
+	mux.HandleFunc("GET /notes/files/{name}", s.handleGardenFile)
+	mux.HandleFunc("GET /notes", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/notes/", http.StatusMovedPermanently)
+	})
+	mux.HandleFunc("GET /api/garden", s.handleGardenAPI)
+	// Pre-garden URLs.
+	mux.HandleFunc("GET /books.html", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/notes/#books", http.StatusMovedPermanently)
+	})
+	mux.HandleFunc("GET /page.html", s.handleOldPage)
 
 	files := http.FileServer(http.Dir(s.staticDir))
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
@@ -86,6 +103,11 @@ func (s *Server) Handler() http.Handler {
 func main() {
 	staticDir := flag.String("static", env("STATIC_DIR", "."), "directory of static site files")
 	flag.Parse()
+	gardenDir := env("GARDEN_DIR", filepath.Join(*staticDir, "garden"))
+	garden, err := LoadGarden(gardenDir)
+	if err != nil {
+		log.Fatalf("load garden: %v", err)
+	}
 
 	base, err := url.Parse(strings.TrimRight(env("BASE_URL", "http://localhost:8080"), "/"))
 	if err != nil || base.Scheme == "" || base.Host == "" {
@@ -113,10 +135,17 @@ func main() {
 		clientSecret: clientSecret,
 		ownerLogin:   env("OWNER_LOGIN", "shantz14"),
 		staticDir:    *staticDir,
+		gardenDir:    gardenDir,
 	}
+	s.garden.Store(garden)
+	log.Printf("garden: %d notes from %s", len(garden.Notes), gardenDir)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
+
+	if os.Getenv("GARDEN_WATCH") != "" {
+		go s.watchGarden(ctx.Done())
+	}
 
 	go func() {
 		t := time.NewTicker(time.Hour)
