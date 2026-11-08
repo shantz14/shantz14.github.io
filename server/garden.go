@@ -9,6 +9,7 @@ import (
 	"html/template"
 	"io/fs"
 	"log"
+	"math/rand/v2"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -379,13 +380,67 @@ func (s *Server) watchGarden(done <-chan struct{}) {
 var templateFS embed.FS
 
 var gardenTemplates = template.Must(template.New("").Funcs(template.FuncMap{
-	"topTag":  topTag,
-	"rowTags": rowTags,
+	"topTag":     topTag,
+	"rowTags":    rowTags,
+	"leafTags":   leafTags,
+	"prettyDate": prettyDate,
 }).ParseFS(templateFS, "templates/*.html"))
 
 func topTag(tag string) string {
 	top, _, _ := strings.Cut(tag, "/")
 	return top
+}
+
+// leafTags drops tags that are only ancestors of another tag: [cs, cs/linux] shows as [cs/linux].
+func leafTags(tags []string) []string {
+	var out []string
+	for _, t := range tags {
+		if !slices.ContainsFunc(tags, func(o string) bool { return strings.HasPrefix(o, t+"/") }) {
+			out = append(out, t)
+		}
+	}
+	return out
+}
+
+// prettyDate writes a frontmatter date (MM-DD-YYYY, as the vault template uses, or YYYY-MM-DD)
+// out as "Dec 2, 2026". Anything else is shown as written.
+func prettyDate(s string) string {
+	for _, layout := range []string{"01-02-2006", "2006-01-02"} {
+		if t, err := time.Parse(layout, strings.TrimSpace(s)); err == nil {
+			return t.Format("Jan 2, 2006")
+		}
+	}
+	return s
+}
+
+// explore suggests up to k other notes to read next, skipping the ones already listed as backlinks:
+// notes sharing a tag with n or two links away rank first, ties broken at random so the list varies.
+func (g *Garden) explore(n *Note, k int) []*Note {
+	near := map[*Note]bool{}
+	for _, l := range slices.Concat(n.Links, n.Backlinks) {
+		for _, m := range slices.Concat(l.Links, l.Backlinks) {
+			near[m] = true
+		}
+	}
+	score := map[*Note]int{}
+	var cands []*Note
+	for _, c := range g.Notes {
+		if c == n || slices.Contains(n.Backlinks, c) {
+			continue
+		}
+		for _, t := range leafTags(c.Tags) {
+			if slices.Contains(n.Tags, t) {
+				score[c] += 2
+			}
+		}
+		if near[c] {
+			score[c]++
+		}
+		cands = append(cands, c)
+	}
+	rand.Shuffle(len(cands), func(i, j int) { cands[i], cands[j] = cands[j], cands[i] })
+	slices.SortStableFunc(cands, func(a, b *Note) int { return cmp.Compare(score[b], score[a]) })
+	return cands[:min(k, len(cands))]
 }
 
 // rowTags describes a note's tags on the index relative to its category: under Computer Science,
@@ -488,12 +543,13 @@ func (s *Server) handleGardenIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleNote(w http.ResponseWriter, r *http.Request) {
-	n := s.garden.Load().Note(r.PathValue("slug"))
+	g := s.garden.Load()
+	n := g.Note(r.PathValue("slug"))
 	if n == nil {
 		s.renderTemplate(w, http.StatusNotFound, "note.html", map[string]any{"Missing": true})
 		return
 	}
-	s.renderTemplate(w, http.StatusOK, "note.html", map[string]any{"Note": n})
+	s.renderTemplate(w, http.StatusOK, "note.html", map[string]any{"Note": n, "Explore": g.explore(n, 5)})
 }
 
 type gardenNoteJSON struct {

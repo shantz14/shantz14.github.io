@@ -1,6 +1,7 @@
 /* Lorenz flow-field background drawn behind the garden pages. */
 (function () {
     const canvas = document.getElementById('lorenz-bg');
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     let W, H;
 

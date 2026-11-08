@@ -3,11 +3,12 @@
 
     <head>
         {{template "head"}}
+        <script src="/note.js" defer></script>
         <title>{{if .Missing}}Not found{{else}}{{.Note.Title}}{{end}} — Isaac Schwarz</title>
     </head>
 
-    <body>
-        <canvas id="lorenz-bg"></canvas>
+    <body{{if not .Missing}} data-note="{{.Note.Slug}}"{{end}}>
+        <canvas id="note-graph-bg" aria-hidden="true"></canvas>
 
         <a class="back" href="/notes/">← notes</a>
 
@@ -21,25 +22,48 @@
                 <h1>{{.Title}}</h1>
                 {{- if or .Created .Tags}}
                 <div class="note-meta">
-                    {{- if .Created}}<time>{{.Created}}</time>{{end}}
-                    {{- range .Tags}}<a class="tag" href="/notes/#{{topTag .}}">#{{.}}</a>{{end}}
+                    {{- if .Created}}
+                    <time>{{prettyDate .Created}}</time>
+                    {{- end}}
+                    {{- with leafTags .Tags}}
+                    <div class="note-tags">
+                        {{- range .}}<a class="tag" href="/notes/#{{topTag .}}">#{{.}}</a>{{end}}
+                    </div>
+                    {{- end}}
                 </div>
                 {{- end}}
                 {{- if .Source}}
                 <p class="note-source">source: <a href="{{.Source}}" rel="nofollow noopener" target="_blank">{{.Source}}</a></p>
                 {{- end}}
                 {{.HTML}}
-                {{- if .Backlinks}}
-                <section class="backlinks">
-                    <p class="section-label">Linked from</p>
-                    {{- range .Backlinks}}
-                    <div class="row"><a class="row-title" href="/notes/{{.Slug}}">{{.Title}}</a></div>
-                    {{- end}}
-                </section>
-                {{- end}}
             {{- end}}
             {{- end}}
             </article>
+
+            {{- if not .Missing}}
+            <aside class="note-side">
+                {{- with .Note.Backlinks}}
+                <section class="side-box">
+                    <p class="side-label">Linked from</p>
+                    <ul>
+                        {{- range .}}
+                        <li><a href="/notes/{{.Slug}}">{{.Title}}</a></li>
+                        {{- end}}
+                    </ul>
+                </section>
+                {{- end}}
+                {{- with .Explore}}
+                <section class="side-box">
+                    <p class="side-label">Explore</p>
+                    <ul>
+                        {{- range .}}
+                        <li><a href="/notes/{{.Slug}}">{{.Title}}</a></li>
+                        {{- end}}
+                    </ul>
+                </section>
+                {{- end}}
+            </aside>
+            {{- end}}
         </div>
     </body>
 
