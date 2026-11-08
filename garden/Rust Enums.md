@@ -24,5 +24,3 @@ impl Foo {
 	}
 }
 ```
-
-Use this for motions?

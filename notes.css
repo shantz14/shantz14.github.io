@@ -55,7 +55,7 @@ body {
     font-family: 'IBM Plex Mono', 'Courier New', monospace;
 }
 
-.back:hover { color: var(--accent); }
+.back:hover { color: var(--name-color); }
 
 /* ── Markdown content ──────────────────────────── */
 
@@ -91,13 +91,13 @@ body {
 }
 
 #content a {
-    color: var(--accent);
+    color: var(--text);
     text-decoration: underline;
-    text-decoration-color: rgba(165, 243, 252, 0.3);
+    text-decoration-color: rgba(255, 255, 255, 0.3);
     text-underline-offset: 3px;
 }
 
-#content a:hover { text-decoration-color: var(--accent); }
+#content a:hover { color: var(--name-color); text-decoration-color: var(--name-color); }
 
 #content ul, #content ol {
     padding-left: 1.4em;
@@ -114,8 +114,8 @@ body {
 #content code {
     font-family: inherit;
     font-size: 0.85em;
-    color: var(--accent);
-    background: var(--accent-dim);
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.06);
     padding: 1px 5px;
 }
 
@@ -136,7 +136,7 @@ body {
 }
 
 #content blockquote {
-    border-left: 2px solid var(--accent);
+    border-left: 2px solid rgba(255, 255, 255, 0.2);
     padding-left: 18px;
     margin: 1.2em 0;
 }
@@ -189,7 +189,7 @@ body {
     overflow-wrap: anywhere;
 }
 
-.note-source a { color: var(--accent); }
+.note-source a { color: var(--text); }
 
 #content a.dead-link, #content .dead-link {
     color: var(--text-muted);
@@ -225,7 +225,7 @@ body {
 
 #content li > ul, #content li > ol { margin-bottom: 0; }
 
-#content input[type=checkbox] { margin-right: 6px; accent-color: var(--accent); }
+#content input[type=checkbox] { margin-right: 6px; accent-color: var(--text-muted); }
 
 #content p:empty { display: none; }
 
@@ -287,7 +287,7 @@ body[data-note] .page-wrap { background: rgba(17, 17, 17, 0.95); }
     transition: color 0.15s, border-color 0.15s;
 }
 
-.side-box a:hover { color: var(--accent); border-left-color: var(--accent); }
+.side-box a:hover { color: var(--name-color); border-left-color: rgba(255, 255, 255, 0.5); }
 
 /* Reading rail: only shown when there is room beside the page (see the wide-screen query). */
 .note-rail { display: none; }
@@ -362,7 +362,7 @@ body[data-note] .page-wrap { background: rgba(17, 17, 17, 0.95); }
     .rail-tick[data-level="2"]::before { width: 6px; }
     .rail-tick[data-level="3"]::before { width: 4px; }
     .rail-tick.passed::before { background: rgba(255, 255, 255, 0.55); }
-    .rail-tick:hover::before { background: var(--accent); width: 10px; }
+    .rail-tick:hover::before { background: var(--name-color); width: 10px; }
 
     .rail-tick span {
         position: absolute;
