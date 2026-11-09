@@ -3,17 +3,25 @@
 
     <head>
         {{template "head"}}
+        <script src="/note.js" defer></script>
         <title>Notes — Isaac Schwarz</title>
     </head>
 
     <body>
-        <canvas id="lorenz-bg"></canvas>
+        <canvas id="note-graph-bg" aria-hidden="true"></canvas>
 
         <a class="back" href="/">← back</a>
 
         <div class="page-wrap">
             <h1 class="garden-title">Notes</h1>
             <p class="hint">{{template "shortcuts"}}</p>
+            {{- if .Tag}}
+            <p class="tag-filter">
+                tagged <span class="tag-filter-name" style="color: {{tagColor .Tag}}">#{{.Tag}}</span>
+                · {{.Count}} {{if eq .Count 1}}note{{else}}notes{{end}}
+                · <a href="/notes/">show all</a>
+            </p>
+            {{- end}}
 
             {{- range $cat := .Categories}}
             <section class="category" id="{{.Key}}">
@@ -26,7 +34,20 @@
                 {{- end}}
             </section>
             {{- else}}
-            <p class="empty-state">No public notes yet.</p>
+            <p class="empty-state">{{if .Tag}}No notes are tagged #{{.Tag}}.{{else}}No public notes yet.{{end}}</p>
+            {{- end}}
+
+            {{- with .TagTree}}
+            <aside class="note-side">
+                <section class="side-box tag-tree">
+                    <p class="side-label">Explore by tag</p>
+                    <ul>
+                        {{- range .}}
+                        <li><a href="/notes/?tag={{.Tag}}" style="--depth: {{.Depth}}; --tag-color: {{tagColor .Tag}}"{{if .Current}} aria-current="true"{{end}}><span>#{{.Name}}</span><span class="tag-count">{{.Count}}</span></a></li>
+                        {{- end}}
+                    </ul>
+                </section>
+            </aside>
             {{- end}}
         </div>
     </body>

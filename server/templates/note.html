@@ -27,7 +27,7 @@
                     {{- end}}
                     {{- with leafTags .Tags}}
                     <div class="note-tags">
-                        {{- range .}}<a class="tag" href="/notes/#{{topTag .}}">#{{.}}</a>{{end}}
+                        {{- range .}}<a class="tag" style="color: {{tagColor .}}" href="/notes/?tag={{.}}">#{{.}}</a>{{end}}
                     </div>
                     {{- end}}
                 </div>

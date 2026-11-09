@@ -180,7 +180,7 @@ body {
 
 #content a.tag { text-decoration: none; }
 
-#content a.tag:hover { opacity: 1; text-decoration: underline; text-decoration-color: var(--accent-border); }
+#content a.tag:hover { opacity: 1; text-decoration: underline; text-decoration-color: currentColor; text-decoration-thickness: 1px; }
 
 .note-source {
     font-size: 0.72rem;
@@ -240,7 +240,7 @@ body {
 
 /* ── Note pages: background graph ──────────────── */
 
-body[data-note] .page-wrap { background: rgba(17, 17, 17, 0.95); }
+#note-graph-bg ~ .page-wrap { background: rgba(17, 17, 17, 0.95); }
 
 #note-graph-bg {
     position: fixed;
@@ -290,7 +290,7 @@ body[data-note] .page-wrap { background: rgba(17, 17, 17, 0.95); }
 .side-box a:hover { color: var(--name-color); border-left-color: rgba(255, 255, 255, 0.5); }
 
 /* Reading rail: only shown when there is room beside the page (see the wide-screen query). */
-.note-rail { display: none; }
+.note-rail, .local-graph { display: none; }
 
 @media (min-width: 1240px) {
     .note-side {
@@ -319,10 +319,45 @@ body[data-note] .page-wrap { background: rgba(17, 17, 17, 0.95); }
         display: block;
         position: fixed;
         z-index: 2;
-        top: 120px;
+        top: 304px;
         left: calc(50% - 360px - 28px);
-        height: min(56vh, 520px);
+        height: min(calc(100vh - 360px), 480px);
     }
+
+    /* Local graph: a square above the rail, its right edge on the rail line. */
+    .local-graph {
+        display: block;
+        position: fixed;
+        z-index: 2;
+        top: 72px;
+        left: calc(50% - 360px - 28px - 180px);
+        width: 180px;
+    }
+
+    .local-graph-frame {
+        position: relative;
+        background: rgba(17, 17, 17, 0.72);
+        border: 1px solid var(--border);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+    }
+
+    .local-graph canvas { display: block; width: 180px; height: 180px; }
+
+    .local-graph-tip {
+        position: absolute;
+        width: max-content;
+        max-width: 160px;
+        padding: 2px 6px;
+        font-size: 0.64rem;
+        color: var(--name-color);
+        background: rgba(17, 17, 17, 0.9);
+        border: 1px solid var(--border);
+        transform: translate(-50%, -100%);
+        pointer-events: none;
+    }
+
+    .local-graph-tip[hidden] { display: none; }
 
     .rail-line {
         position: relative;
@@ -509,3 +544,38 @@ body[data-note] .page-wrap { background: rgba(17, 17, 17, 0.95); }
         left: 28px;
     }
 }
+
+/* ── Garden index: tag filter and tag explorer ── */
+
+.tag-filter {
+    margin: -32px 0 40px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+.tag-filter-name { font-weight: 500; }
+
+.tag-filter a {
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.3);
+    text-underline-offset: 3px;
+}
+
+.tag-filter a:hover { color: var(--name-color); text-decoration-color: var(--name-color); }
+
+.tag-tree a {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding-left: calc(10px + var(--depth, 0) * 12px);
+}
+
+.tag-tree a span:first-child { color: var(--tag-color); opacity: 0.8; }
+
+.tag-tree a:hover span:first-child,
+.tag-tree a[aria-current] span:first-child { opacity: 1; }
+
+.tag-tree a[aria-current] { border-left-color: var(--tag-color); color: var(--name-color); }
+
+.tag-count { font-size: 0.66rem; opacity: 0.5; }

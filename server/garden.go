@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"embed"
 	"fmt"
+	"hash/fnv"
 	"html/template"
 	"io/fs"
 	"log"
@@ -384,7 +385,29 @@ var gardenTemplates = template.Must(template.New("").Funcs(template.FuncMap{
 	"rowTags":    rowTags,
 	"leafTags":   leafTags,
 	"prettyDate": prettyDate,
+	"tagColor":   tagColor,
 }).ParseFS(templateFS, "templates/*.html"))
+
+// tagPalette holds pastel colours that read well on the dark background.
+var tagPalette = []string{
+	"#a5f3fc", // cyan
+	"#fca5a5", // red
+	"#fcd34d", // amber
+	"#86efac", // green
+	"#c4b5fd", // violet
+	"#f9a8d4", // pink
+	"#fdba74", // orange
+	"#93c5fd", // blue
+	"#5eead4", // teal
+	"#d9f99d", // lime
+}
+
+// tagColor picks a colour from the tag's top level, so cs/linux and cs/rust share one.
+func tagColor(tag string) template.CSS {
+	h := fnv.New32a()
+	h.Write([]byte(topTag(tag)))
+	return template.CSS(tagPalette[h.Sum32()%uint32(len(tagPalette))])
+}
 
 func topTag(tag string) string {
 	top, _, _ := strings.Cut(tag, "/")
@@ -539,7 +562,67 @@ func (s *Server) handleGardenIndex(w http.ResponseWriter, r *http.Request) {
 	if g != nil {
 		notes = g.Notes
 	}
-	s.renderTemplate(w, http.StatusOK, "index.html", map[string]any{"Categories": categorize(notes), "Count": len(notes)})
+	tag := strings.Trim(r.URL.Query().Get("tag"), "#/ ")
+	shown := notes
+	if tag != "" {
+		shown = nil
+		for _, n := range notes {
+			if hasTag(n, tag) {
+				shown = append(shown, n)
+			}
+		}
+	}
+	s.renderTemplate(w, http.StatusOK, "index.html", map[string]any{
+		"Categories": categorize(shown),
+		"Count":      len(shown),
+		"Tag":        tag,
+		"TagTree":    tagTree(notes, tag),
+	})
+}
+
+// hasTag reports whether n is tagged tag or one of its subtags (cs matches cs/linux).
+func hasTag(n *Note, tag string) bool {
+	return slices.ContainsFunc(n.Tags, func(t string) bool { return t == tag || strings.HasPrefix(t, tag+"/") })
+}
+
+type tagEntry struct {
+	Tag, Name string // full tag and its last segment
+	Depth     int
+	Count     int
+	Current   bool
+}
+
+// tagTree lists every tag in use, ancestors included, sorted so subtags sit under their parent,
+// with how many notes each one (or a subtag of it) covers.
+func tagTree(notes []*Note, current string) []tagEntry {
+	seen := map[string]bool{}
+	var tags []string
+	for _, n := range notes {
+		for _, t := range n.Tags {
+			parts := strings.Split(t, "/")
+			for i := range parts {
+				a := strings.Join(parts[:i+1], "/")
+				if !seen[a] {
+					seen[a] = true
+					tags = append(tags, a)
+				}
+			}
+		}
+	}
+	slices.SortFunc(tags, func(a, b string) int {
+		return slices.Compare(strings.Split(a, "/"), strings.Split(b, "/"))
+	})
+	out := make([]tagEntry, 0, len(tags))
+	for _, t := range tags {
+		e := tagEntry{Tag: t, Name: t[strings.LastIndex(t, "/")+1:], Depth: strings.Count(t, "/"), Current: t == current}
+		for _, n := range notes {
+			if hasTag(n, t) {
+				e.Count++
+			}
+		}
+		out = append(out, e)
+	}
+	return out
 }
 
 func (s *Server) handleNote(w http.ResponseWriter, r *http.Request) {

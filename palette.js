@@ -123,7 +123,7 @@
 
   // ── DOM ──
 
-  let backdrop, input, list, items = [], selected = 0, returnFocus = null;
+  let backdrop, panel, input, list, preview, items = [], selected = 0, returnFocus = null;
   let mode = 'commands', garden = null, gardenError = false;
 
   function build() {
@@ -132,7 +132,7 @@
     backdrop.hidden = true;
     backdrop.addEventListener('mousedown', (e) => { if (e.target === backdrop) close(); });
 
-    const panel = document.createElement('div');
+    panel = document.createElement('div');
     panel.className = 'cp-panel';
     panel.setAttribute('role', 'dialog');
     panel.setAttribute('aria-label', 'Command palette');
@@ -173,13 +173,23 @@
       footer.append(hint);
     }
 
-    panel.append(input, list, footer);
+    preview = document.createElement('div');
+    preview.className = 'cp-preview';
+    preview.setAttribute('aria-hidden', 'true');
+
+    const body = document.createElement('div');
+    body.className = 'cp-body';
+    body.append(list, preview);
+
+    panel.append(input, body, footer);
     backdrop.append(panel);
     document.body.append(backdrop);
   }
 
   function setMode(m) {
     mode = m;
+    panel.classList.toggle('cp-with-preview', m === 'notes');
+    if (m !== 'notes') showPreview(null);
     input.placeholder = MODES[m].placeholder;
     if (m === 'notes' && !garden) {
       window.loadGarden()
@@ -230,6 +240,7 @@
     items = results(input.value);
     if (!items.length) {
       message(MODES[mode].empty);
+      if (mode === 'notes') showPreview(null);
       return;
     }
 
@@ -261,8 +272,54 @@
     select(Math.min(selected, items.length - 1));
   }
 
+  // ── Note preview ──
+  // The selected note's rendered body, taken from its own page so it looks the same, cached per note.
+  const previews = new Map();
+  let previewTimer = 0, previewWant = null;
+
+  function fetchPreview(slug) {
+    if (!previews.has(slug)) {
+      previews.set(slug, fetch('/notes/' + slug)
+        .then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); })
+        .then((html) => {
+          const article = new DOMParser().parseFromString(html, 'text/html').getElementById('content');
+          if (!article) throw new Error('no content');
+          article.querySelectorAll('script, iframe').forEach((el) => el.remove());
+          // Drop ids so the copy can't clash with the page it's shown on (e.g. #content, heading anchors).
+          article.removeAttribute('id');
+          article.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
+          return article;
+        })
+        .catch((err) => { previews.delete(slug); throw err; }));
+    }
+    return previews.get(slug);
+  }
+
+  function showPreview(slug) {
+    clearTimeout(previewTimer);
+    previewWant = slug;
+    if (!slug) { preview.replaceChildren(); return; }
+    // Wait a beat so holding an arrow key doesn't fire a request per row.
+    previewTimer = setTimeout(() => {
+      fetchPreview(slug)
+        .then((article) => {
+          if (previewWant !== slug) return;
+          preview.replaceChildren(article.cloneNode(true));
+          preview.scrollTop = 0;
+        })
+        .catch(() => {
+          if (previewWant !== slug) return;
+          const p = document.createElement('p');
+          p.className = 'cp-preview-empty';
+          p.textContent = 'Preview unavailable.';
+          preview.replaceChildren(p);
+        });
+    }, previews.has(slug) ? 0 : 60);
+  }
+
   function select(i) {
     selected = i;
+    if (mode === 'notes') showPreview(items[i]?.item.id ?? null);
     [...list.children].forEach((li, j) => li.setAttribute('aria-selected', String(j === i)));
     const li = list.children[i];
     if (li) {
