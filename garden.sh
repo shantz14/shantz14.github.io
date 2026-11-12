@@ -1,6 +1,7 @@
 #!/bin/bash
 # Publishes every Obsidian note tagged `public` into garden/ (flat, by file name).
-# Notes without the tag never leave the vault. Run with --watch to resync on every vault change.
+# Notes without the tag never leave the vault, except that the citation metadata (never the body)
+# of a source note cited by a public note goes to garden/sources/. Run with --watch to resync on every vault change.
 set -euo pipefail
 
 VAULT="${VAULT:-$HOME/Dev/vault67}"
@@ -23,6 +24,17 @@ tags_of() {
     ' "$1"
 }
 
+# Prints only the citation fields of a source note's frontmatter. Its body (reading notes,
+# highlights) and every other field stay in the vault.
+citation_of() {
+    awk '
+        NR == 1 { if ($0 != "---") exit; print; next }
+        /^---[[:space:]]*$/ { print; exit }
+        /^[^[:space:]-][^:]*:/ { key = $0; sub(/:.*/, "", key); keep = (key ~ /^(citekey|type|title|author|issued|container-title|publisher|doi|isbn|url)$/) }
+        keep { print }
+    ' "$1"
+}
+
 sync() {
     local tmp
     tmp="$(mktemp -d)"
@@ -35,6 +47,15 @@ sync() {
             continue
         fi
         cp "$note" "$tmp/$name"
+        # Publish the citation metadata of every work the note cites ([[@citekey]]) to sources/.
+        grep -oE '\[\[([^]|#]*/)?@[^]|#/]+' "$note" | sed 's/.*@//' | sort -u | while IFS= read -r key; do
+            local cited
+            cited="$(find "$VAULT" -path "$VAULT/.git" -prune -o -name "@$key.md" -type f -print -quit)"
+            if [[ -n "$cited" ]]; then
+                mkdir -p "$tmp/sources"
+                citation_of "$cited" > "$tmp/sources/@$key.md"
+            fi
+        done || true
         # Copy embedded attachments (![[file.png]]) that exist somewhere in the vault.
         grep -oE '!\[\[[^]|#]+\.(png|jpe?g|gif|svg|webp)' "$note" | sed 's/^!\[\[//' | while IFS= read -r att; do
             local src
@@ -46,7 +67,7 @@ sync() {
     mkdir -p "$DEST"
     rsync -a --delete --checksum "$tmp/" "$DEST/"
     rm -rf "$tmp"
-    echo "garden: $(find "$DEST" -name '*.md' | wc -l) public notes"
+    echo "garden: $(find "$DEST" -maxdepth 1 -name '*.md' | wc -l) public notes, $(find "$DEST/sources" -name '*.md' 2>/dev/null | wc -l) cited sources"
 }
 
 sync

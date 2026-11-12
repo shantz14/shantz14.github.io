@@ -191,6 +191,27 @@ body {
 
 .note-source a { color: var(--text); }
 
+/* Bibliography compiled from a note's [[@citekey]] citations. */
+.bibliography {
+    margin-top: 56px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+}
+
+#content .bibliography ul { list-style: none; padding: 0; margin: 0; }
+
+#content .bibliography li {
+    font-size: 0.85em;
+    color: var(--text-muted);
+    margin: 0 0 12px;
+    padding-left: 1.6em;
+    text-indent: -1.6em; /* hanging indent */
+    overflow-wrap: anywhere;
+    scroll-margin-top: 24px;
+}
+
+#content .bibliography li:target { color: var(--text); }
+
 #content a.dead-link, #content .dead-link {
     color: var(--text-muted);
     opacity: 0.55;

@@ -41,15 +41,18 @@ type Note struct {
 
 	body      string   // markdown after the frontmatter
 	related   []string // wikilink targets from the `related:` frontmatter field
+	cited     []string // citekeys from the `source:` frontmatter field
 	Links     []*Note  // outgoing, resolved, deduplicated
 	Backlinks []*Note
+	Refs      []*Source // works the note cites, in reference-list order
 }
 
 // Garden is an immutable snapshot of the published notes; reloads swap in a new one.
 type Garden struct {
-	Notes  []*Note // sorted by title
-	bySlug map[string]*Note
-	byName map[string]*Note // lowercased title or alias
+	Notes   []*Note // sorted by title
+	bySlug  map[string]*Note
+	byName  map[string]*Note   // lowercased title or alias
+	sources map[string]*Source // lowercased citekey
 }
 
 // Note returns the note with the given slug, or nil. Safe on a nil Garden.
@@ -147,15 +150,25 @@ var wikilink = regexp.MustCompile(`(!?)\[\[([^\[\]|#]*)(#[^\[\]|]*)?(?:\|([^\[\]
 var codeSpans = regexp.MustCompile("(?s)(?m:^[ \t]*```.*?^[ \t]*```[ \t]*$)|`[^`\n]+`")
 
 // rewriteWikilinks turns Obsidian wikilinks into markdown links (or plain text for notes that
-// aren't published), outside of code. It returns the rewritten markdown and the notes it linked to.
-func (g *Garden) rewriteWikilinks(md string) (string, []*Note) {
+// aren't published), outside of code. A citation, [[@citekey]], links to the work's entry in the
+// note's reference list. It returns the rewritten markdown, the notes it linked to and the works it cited.
+func (g *Garden) rewriteWikilinks(md string) (string, []*Note, []*Source) {
 	var linked []*Note
+	var cited []*Source
 	replace := func(s string) string {
 		return wikilink.ReplaceAllStringFunc(s, func(m string) string {
 			p := wikilink.FindStringSubmatch(m)
 			embed, target, heading, display := p[1] == "!", strings.TrimSpace(p[2]), strings.TrimPrefix(p[3], "#"), p[4]
 			if embed && isImage(target) {
 				return fmt.Sprintf("![%s](/notes/files/%s)", escapeMD(cmp.Or(display, target)), pathEscape(target))
+			}
+			if key := citeKey(target); key != "" {
+				src := g.sources[strings.ToLower(key)]
+				if src == nil {
+					return `<span class="dead-link">` + template.HTMLEscapeString(cmp.Or(display, "@"+key)) + `</span>`
+				}
+				cited = append(cited, src)
+				return fmt.Sprintf("[%s](#%s)", escapeMD(cmp.Or(display, src.Cite())), src.ID())
 			}
 			if display == "" {
 				switch {
@@ -191,7 +204,7 @@ func (g *Garden) rewriteWikilinks(md string) (string, []*Note) {
 		last = loc[1]
 	}
 	out.WriteString(replace(md[last:]))
-	return out.String(), linked
+	return out.String(), linked, cited
 }
 
 func isImage(name string) bool {
@@ -242,12 +255,15 @@ func (r *noteRenderer) render(src string) (template.HTML, error) {
 
 // LoadGarden reads every .md file directly inside dir. A missing dir is an empty garden.
 func LoadGarden(dir string) (*Garden, error) {
-	g := &Garden{bySlug: map[string]*Note{}, byName: map[string]*Note{}}
+	g := &Garden{bySlug: map[string]*Note{}, byName: map[string]*Note{}, sources: map[string]*Source{}}
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return g, nil
 		}
+		return nil, err
+	}
+	if g.sources, err = loadSources(filepath.Join(dir, sourcesDir)); err != nil {
 		return nil, err
 	}
 
@@ -267,9 +283,21 @@ func LoadGarden(dir string) (*Garden, error) {
 			Title:   strings.TrimSuffix(e.Name(), ".md"),
 			Aliases: fm["aliases"],
 			Created: strings.Join(fm["created_on"], " "),
-			Source:  strings.Join(fm["source"], " "),
 			body:    body,
 		}
+		var urls []string
+		for _, v := range fm["source"] { // a URL, or a citation such as "[[@citekey]]"
+			cites := wikilink.FindAllStringSubmatch(v, -1)
+			if len(cites) == 0 {
+				urls = append(urls, v)
+			}
+			for _, m := range cites {
+				if key := citeKey(m[2]); key != "" {
+					n.cited = append(n.cited, key)
+				}
+			}
+		}
+		n.Source = strings.Join(urls, " ")
 		for _, t := range fm["tags"] {
 			if t = strings.TrimPrefix(t, "#"); t != publicTag && !slices.Contains(n.Tags, t) {
 				n.Tags = append(n.Tags, t)
@@ -305,7 +333,18 @@ func LoadGarden(dir string) (*Garden, error) {
 
 	r := newNoteRenderer()
 	for _, n := range g.Notes {
-		md, linked := g.rewriteWikilinks(stripTitleHeading(n.body, n.Title))
+		md, linked, cited := g.rewriteWikilinks(stripTitleHeading(n.body, n.Title))
+		for _, key := range n.cited {
+			if src := g.sources[strings.ToLower(key)]; src != nil {
+				cited = append(cited, src)
+			}
+		}
+		for _, src := range cited {
+			if !slices.Contains(n.Refs, src) {
+				n.Refs = append(n.Refs, src)
+			}
+		}
+		sortSources(n.Refs)
 		for _, rel := range n.related {
 			if t := g.resolve(rel); t != nil {
 				linked = append(linked, t)
@@ -386,6 +425,7 @@ var gardenTemplates = template.Must(template.New("").Funcs(template.FuncMap{
 	"leafTags":   leafTags,
 	"prettyDate": prettyDate,
 	"tagColor":   tagColor,
+	"dot":        dot,
 }).ParseFS(templateFS, "templates/*.html"))
 
 // tagPalette holds pastel colours that read well on the dark background.

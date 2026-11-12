@@ -194,3 +194,76 @@ func TestGardenNilSafe(t *testing.T) {
 	cl.expect(200, "GET", "/api/garden", nil)
 	cl.expect(301, "GET", "/page.html?doc=x", nil)
 }
+
+func TestBibliography(t *testing.T) {
+	dir := t.TempDir()
+	writeNotes(t, dir, map[string]string{
+		"Raft": pub + "Consensus [[@ongaro2014|(Ongaro & Ousterhout, 2014, p. 3)]], built on [[Sources/@lamport1998]].\n" +
+			"Again [[@ongaro2014]]. Missing [[@nobody2020]]. `[[@lamport1998]]`\n",
+		"Dynamo": "---\ntags: [public]\nsource: \"[[@decandia2007]]\"\n---\nnotes\n",
+		"Plain":  "---\ntags: [public]\nsource: https://example.com/a\n---\nnotes\n",
+	})
+	writeNotes(t, filepath.Join(dir, sourcesDir), map[string]string{
+		"@ongaro2014": "---\ncitekey: ongaro2014\ntitle: \"In Search of an Understandable Consensus Algorithm\"\nauthor:\n" +
+			"  - \"Ongaro, Diego\"\n  - \"Ousterhout, John\"\nissued: 2014\ncontainer-title: \"\"\ndoi: \nurl: https://www.usenix.org/raft\n---\n",
+		"@lamport1998":  "---\ntitle: \"The Part-Time Parliament\"\nauthor:\n  - \"Lamport, Leslie\"\nissued: 1998\ncontainer-title: \"ACM TOCS\"\ndoi: 10.1145/279227.279229\n---\n",
+		"@decandia2007": "---\ntitle: Dynamo\nauthor:\n  - \"DeCandia, Giuseppe\"\n  - \"Hastorun, Deniz\"\n  - \"Jampani, Madan\"\nurl: javascript:alert(1)\n---\n",
+	})
+	g, err := LoadGarden(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(g.Notes) != 3 {
+		t.Fatalf("sources must not be loaded as notes: got %d notes", len(g.Notes))
+	}
+
+	raft := g.Note("raft")
+	if len(raft.Refs) != 2 || raft.Refs[0].Key != "lamport1998" || raft.Refs[1].Key != "ongaro2014" {
+		t.Fatalf("Raft refs = %+v, want lamport1998 then ongaro2014", raft.Refs)
+	}
+	html := string(raft.HTML)
+	for _, want := range []string{
+		`<a href="#ref-ongaro2014">(Ongaro &amp; Ousterhout, 2014, p. 3)</a>`,
+		`<a href="#ref-lamport1998">(Lamport, 1998)</a>`,
+		`<a href="#ref-ongaro2014">(Ongaro &amp; Ousterhout, 2014)</a>`,
+		`<span class="dead-link">@nobody2020</span>`,
+		`<code>[[@lamport1998]]</code>`,
+	} {
+		if !strings.Contains(html, want) {
+			t.Errorf("Raft HTML missing %s\n%s", want, html)
+		}
+	}
+
+	dynamo := g.Note("dynamo")
+	if dynamo.Source != "" || len(dynamo.Refs) != 1 {
+		t.Fatalf("Dynamo: Source = %q, Refs = %+v", dynamo.Source, dynamo.Refs)
+	}
+	d := dynamo.Refs[0]
+	if d.Cite() != "(DeCandia et al., n.d.)" || d.Link() != "" || d.AuthorList() != "DeCandia, G., Hastorun, D., & Jampani, M." {
+		t.Errorf("Dynamo ref: Cite %q, Link %q, AuthorList %q", d.Cite(), d.Link(), d.AuthorList())
+	}
+	if p := g.Note("plain"); p.Source != "https://example.com/a" || len(p.Refs) != 0 {
+		t.Errorf("Plain: Source = %q, Refs = %+v", p.Source, p.Refs)
+	}
+
+	var buf strings.Builder
+	if err := gardenTemplates.ExecuteTemplate(&buf, "note.html", map[string]any{"Note": raft}); err != nil {
+		t.Fatal(err)
+	}
+	page := buf.String()
+	for _, want := range []string{
+		`<li id="ref-lamport1998">Lamport, L. (1998).`,
+		`<a href="https://doi.org/10.1145/279227.279229" rel="nofollow noopener" target="_blank">The Part-Time Parliament</a>. <em>ACM TOCS.</em>`,
+		`<li id="ref-ongaro2014">Ongaro, D., &amp; Ousterhout, J. (2014).`,
+		`<em><a href="https://www.usenix.org/raft" rel="nofollow noopener" target="_blank">In Search of an Understandable Consensus Algorithm</a></em>.`,
+	} {
+		if !strings.Contains(page, want) {
+			t.Errorf("page missing %s", want)
+		}
+	}
+	buf.Reset()
+	gardenTemplates.ExecuteTemplate(&buf, "note.html", map[string]any{"Note": g.Note("plain")})
+	if strings.Contains(buf.String(), "Bibliography") {
+		t.Error("a note without citations must not get a bibliography")
+	}
+}

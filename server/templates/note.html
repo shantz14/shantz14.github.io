@@ -36,6 +36,20 @@
                 <p class="note-source">source: <a href="{{.Source}}" rel="nofollow noopener" target="_blank">{{.Source}}</a></p>
                 {{- end}}
                 {{.HTML}}
+                {{- with .Refs}}
+                <section class="bibliography" id="bibliography">
+                    <h2>Bibliography</h2>
+                    <ul>
+                        {{- range .}}
+                        <li id="{{.ID}}">
+                            {{- with .AuthorList}}{{dot .}} {{end}}({{.YearOrND}}).
+                            {{if .Container}}{{template "ref-title" .}}. <em>{{dot .Container}}</em>{{else}}<em>{{template "ref-title" .}}</em>.{{end}}
+                            {{- with .Publisher}} {{dot .}}{{end}}
+                        </li>
+                        {{- end}}
+                    </ul>
+                </section>
+                {{- end}}
             {{- end}}
             {{- end}}
             </article>
@@ -68,3 +82,5 @@
     </body>
 
 </html>
+
+{{define "ref-title"}}{{if .Link}}<a href="{{.Link}}" rel="nofollow noopener" target="_blank">{{.Title}}</a>{{else}}{{.Title}}{{end}}{{end}}
